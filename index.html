@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>MobilePay skifter navn til Vipps</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+
+    /* =========================================================
+       VARIABLES
+       ========================================================= */
+
+    :root {
+      --mobilepay-blue: #5873f8;
+      --mobilepay-blue-dark: #4d67ec;
+      --mobilepay-yellow: #eaff00;
+
+      --white: #ffffff;
+      --black: #090909;
+
+      --content-width: 580px;
+    }
+
+
+    /* =========================================================
+       RESET
+       ========================================================= */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+
+      min-height: 100vh;
+
+      background: var(--mobilepay-blue);
+
+      color: var(--white);
+
+      font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+
+    /* =========================================================
+       FULL PAGE
+       ========================================================= */
+
+    .page {
+      position: relative;
+
+      width: 100%;
+      min-height: 100vh;
+
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 50% 10%,
+          rgba(255,255,255,.06),
+          transparent 34%
+        ),
+        linear-gradient(
+          to bottom,
+          var(--mobilepay-blue) 0%,
+          var(--mobilepay-blue) 48%,
+          var(--mobilepay-blue-dark) 100%
+        );
+    }
+
+
+    /* =========================================================
+       MAIN CONTENT
+       ========================================================= */
+
+    .content {
+      position: relative;
+      z-index: 2;
+
+      width: min(
+        calc(100% - 48px),
+        760px
+      );
+
+      margin: 0 auto;
+
+      padding:
+        clamp(60px, 8vw, 110px)
+        0
+        clamp(90px, 10vw, 150px);
+    }
+
+
+    /* =========================================================
+       BRAND HEADER
+       ========================================================= */
+
+    .brand-change {
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      gap: clamp(10px, 1vw, 20px);
+
+      margin-bottom:
+        clamp(45px, 6vw, 80px);
+    }
+
+
+    /* =========================================================
+       LOGOS
+       ========================================================= */
+
+    .mobilepay-logo,
+    .vipps-logo {
+      display: block;
+
+      width: auto;
+
+      object-fit: contain;
+
+      flex-shrink: 0;
+    }
+
+
+    /*
+     * The two logo files have different proportions
+     * and internal whitespace.
+     *
+     * Matching them by height instead of width makes
+     * them appear visually much closer in size.
+     */
+
+    .mobilepay-logo {
+      height: clamp(22px, 2.8vw, 38px);
+    }
+
+    .vipps-logo {
+      height: clamp(18px, 2vw, 30px); 
+    }
+
+
+    /* Small text between logos */
+
+    .brand-change-text {
+      flex-shrink: 0;
+
+      font-size: clamp(
+        12px,
+        1.45vw,
+        18px
+      );
+
+      font-weight: 500;
+
+      line-height: 1;
+
+      color: rgba(255,255,255,.96);
+
+      white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       MAIN TITLE
+       ========================================================= */
+
+    .hero-title {
+      margin:
+        0
+        0
+        clamp(35px, 4vw, 55px);
+
+      text-align: center;
+
+      font-size: clamp(
+        50px,
+        7vw,
+        92px
+      );
+
+      line-height: .94;
+
+      letter-spacing: -.055em;
+
+      font-weight: 600;
+    }
+
+
+    /* =========================================================
+       STORY
+       ========================================================= */
+
+    .story {
+      width: min(
+        100%,
+        var(--content-width)
+      );
+
+      margin: 0 auto;
+
+      font-family:
+        "Playfair Display",
+        Georgia,
+        serif;
+
+      font-size: clamp(
+        17px,
+        1.55vw,
+        22px
+      );
+
+      line-height: 1.37;
+
+      text-align: center;
+
+      color: rgba(255,255,255,.97);
+    }
+
+
+    .story p {
+      margin:
+        0
+        0
+        clamp(38px, 5vw, 62px);
+    }
+
+
+    .story p:last-child {
+      margin-bottom: 0;
+    }
+
+
+    /* =========================================================
+       INTERACTIVE WORDS
+       ========================================================= */
+
+    .term {
+      appearance: none;
+
+      display: inline;
+
+      margin: 0;
+      padding: 0;
+
+      border: 0;
+
+      border-bottom:
+        1px dashed
+        rgba(255,255,255,.9);
+
+      background: transparent;
+
+      color: inherit;
+
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+
+      cursor: help;
+
+      transition:
+        opacity .18s ease,
+        border-color .18s ease;
+    }
+
+
+    .term:hover,
+    .term:focus-visible {
+      opacity: .7;
+
+      border-bottom-color:
+        rgba(255,255,255,1);
+
+      outline: none;
+    }
+
+
+    /* =========================================================
+       TOOLTIP
+       ========================================================= */
+
+    .tooltip-card {
+      position: fixed;
+
+      z-index: 50;
+
+      width: min(
+        320px,
+        calc(100vw - 32px)
+      );
+
+      padding:
+        38px
+        32px
+        32px;
+
+      background:
+        var(--mobilepay-yellow);
+
+      color:
+        var(--black);
+
+      box-shadow:
+        0 22px 45px
+        rgba(0,0,0,.30);
+
+      opacity: 0;
+
+      visibility: hidden;
+
+      pointer-events: none;
+
+      transform:
+        translateY(10px)
+        scale(.97);
+
+      transition:
+        opacity .16s ease,
+        transform .16s ease,
+        visibility .16s ease;
+    }
+
+
+    .tooltip-card.is-open {
+      opacity: 1;
+
+      visibility: visible;
+
+      pointer-events: auto;
+
+      transform:
+        translateY(0)
+        scale(1);
+    }
+
+
+    /* Tooltip title */
+
+    .tooltip-card h2 {
+      margin:
+        0
+        0
+        13px;
+
+      font-family:
+        "Inter",
+        sans-serif;
+
+      font-size: 24px;
+
+      line-height: 1.05;
+
+      letter-spacing: -.035em;
+
+      font-weight: 700;
+    }
+
+
+    /* Tooltip text */
+
+    .tooltip-card p {
+      margin: 0;
+
+      font-family:
+        "Playfair Display",
+        Georgia,
+        serif;
+
+      font-size: 15px;
+
+      line-height: 1.28;
+
+      text-align: left;
+    }
+
+
+    /* Close button */
+
+    .tooltip-close {
+      position: absolute;
+
+      top: 9px;
+      right: 12px;
+
+      padding: 0;
+
+      border: 0;
+
+      background: none;
+
+      color: var(--black);
+
+      font-size: 27px;
+
+      line-height: 1;
+
+      cursor: pointer;
+    }
+
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+      :root {
+        --content-width: 560px;
+      }
+
+
+      .content {
+        width: min(
+          calc(100% - 40px),
+          700px
+        );
+
+        padding-top: 55px;
+      }
+
+
+      .brand-change {
+        margin-bottom: 50px;
+      }
+
+
+      .hero-title {
+        margin-bottom: 40px;
+      }
+
+
+      .story {
+        font-size:
+          clamp(
+            16px,
+            2.3vw,
+            20px
+          );
+
+        line-height: 1.4;
+      }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 600px) {
+
+      .content {
+        width:
+          calc(100% - 32px);
+
+        padding:
+          38px
+          0
+          80px;
+      }
+
+
+      .brand-change {
+        gap: 10px;
+
+        margin-bottom: 42px;
+      }
+
+
+      /*
+       * Matching by visual height gives both logos
+       * a more balanced appearance on mobile.
+       */
+
+      .mobilepay-logo {
+        width: auto;
+        height: 28px;
+      }
+
+
+      .vipps-logo {
+        width: auto;
+        height: 27px;
+      }
+
+
+      .brand-change-text {
+        font-size: 10px;
+      }
+
+
+      .hero-title {
+        margin-bottom: 34px;
+
+        font-size:
+          clamp(
+            46px,
+            14vw,
+            66px
+          );
+
+        line-height: .94;
+      }
+
+
+      .story {
+        width: 91%;
+
+        font-size:
+          clamp(
+            15px,
+            4.2vw,
+            18px
+          );
+
+        line-height: 1.38;
+      }
+
+
+      .story p {
+        margin-bottom: 38px;
+      }
+
+
+      /*
+       * Tooltip becomes centered on mobile.
+       */
+
+      .tooltip-card {
+        left: 50% !important;
+        top: 50% !important;
+
+        width:
+          min(
+            330px,
+            calc(100vw - 28px)
+          );
+
+        transform:
+          translate(
+            -50%,
+            calc(-50% + 10px)
+          )
+          scale(.97);
+      }
+
+
+      .tooltip-card.is-open {
+        transform:
+          translate(-50%, -50%)
+          scale(1);
+      }
+
+    }
+
+
+    /* =========================================================
+       VERY SMALL PHONES
+       ========================================================= */
+
+    @media (max-width: 380px) {
+
+      .brand-change {
+        gap: 7px;
+      }
+
+
+      .mobilepay-logo {
+        width: auto;
+        height: 24px;
+      }
+
+
+      .vipps-logo {
+        width: auto;
+        height: 23px;
+      }
+
+
+      .brand-change-text {
+        font-size: 8px;
+      }
+
+
+      .story {
+        width: 94%;
+
+        font-size: 15px;
+      }
+
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+
+        transition: none !important;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <main class="page">
+
+    <div class="content">
+
+
+      <!-- =====================================
+           LOGO CHANGE
+           ===================================== -->
+
+      <div class="brand-change">
+
+        <img
+          src="MP_Logo_Vertical-digital_White_RGB.svg"
+          alt="MobilePay"
+          class="mobilepay-logo"
+        >
+
+        <span class="brand-change-text">
+          skifter navn til
+        </span>
+
+        <img
+          src="vipps.png"
+          alt="Vipps"
+          class="vipps-logo"
+        >
+
+      </div>
+
+
+      <!-- =====================================
+           TITLE
+           ===================================== -->
+
+      <h1 class="hero-title">
+        Hvorfor?
+      </h1>
+
+
+      <!-- =====================================
+           STORY
+           ===================================== -->
+
+      <div class="story">
+
+  <p>
+
+    MobilePay blev en næsten
+
+    <button
+      class="term"
+      type="button"
+      data-title="Øjeblikkelig succes"
+      data-explanation="MobilePay blev hurtigt en del af hverdagen. Jo flere der downloadede appen, desto større blev værdien af tjenesten for alle."
+    >
+      øjeblikkelig succes
+    </button>
+
+    da vi lancerede i 2013.
+
+    Hver gang en dansker, og senere en finne,
+    downloadede appen, voksede nytteværdien
+    eksponentielt.
+
+    Og se os nu:
+    stort set alle bruger MobilePay.
+
+    Ikke dårligt!
+
+  </p>
+
+
+  <p>
+
+    Men fremtiden byder på mere
+
+    <button
+      class="term"
+      type="button"
+      data-title="Mere konkurrence"
+      data-explanation="Betalingsmarkedet bliver stadig mere konkurrencepræget, især fordi store globale teknologivirksomheder fortsætter med at investere i digitale betalingsløsninger."
+    >
+      konkurrence
+    </button>
+
+    end nogensinde før, især fra de amerikanske techgiganter,
+    som har dybe lommer og endnu større ambitioner.
+
+    For at lykkes med vores ambition
+    om at blive det
+
+    <button
+      class="term"
+      type="button"
+      data-title="Det nordiske alternativ"
+      data-explanation="Vores ambition er at skabe et stærkt nordisk alternativ: en betalingsoplevelse bygget op omkring nordiske brugere, virksomheder og markeder."
+    >
+      nordiske alternativ
+    </button>
+
+    er vi nødt til at samle os under
+
+    <button
+      class="term"
+      type="button"
+      data-title="Ét brand"
+      data-explanation="Et fælles brand gør produktet lettere at genkende på tværs af markeder og giver os én stærk identitet for fremtidige tjenester."
+    >
+      ét brand
+    </button>.
+
+    Vi er nødt til at forandre os for at bevare.
+
+  </p>
+
+
+  <p>
+
+    I 2022
+
+    <button
+      class="term"
+      type="button"
+      data-title="Slog vi os sammen"
+      data-explanation="MobilePay og Vipps slog sig sammen for at skabe noget stærkere sammen og arbejde hen imod en fælles nordisk betalingsoplevelse."
+    >
+      slog vi os sammen
+    </button>
+
+    med norske Vipps for at bygge noget
+    større og bedre:
+
+    en stærk,
+
+    <button
+      class="term"
+      type="button"
+      data-title="En nordisk app"
+      data-explanation="Én app og én fælles retning kan skabe en enklere og mere genkendelig oplevelse på tværs af de nordiske lande."
+    >
+      nordisk app
+    </button>.
+
+    Og nu går vi all in
+    og skaber
+
+    <button
+      class="term"
+      type="button"
+      data-title="Ét fælles nordisk navn"
+      data-explanation="Ét fælles navn på tværs af de nordiske markeder gør den samlede oplevelse enklere for både brugere og virksomheder."
+    >
+      ét fælles nordisk navn
+    </button>
+
+    som du kan møde i Danmark,
+    Norge, Finland, Sverige og Grønland,
+
+    og hvem ved,
+    måske endda i flere lande med tiden!
+
+    Vi bliver til meget mere
+    end bare mobilbetalinger,
+
+    og navnet
+
+    <button
+      class="term"
+      type="button"
+      data-title="Vipps"
+      data-explanation="Vipps bliver det fælles navn, der repræsenterer det samlede nordiske produkt og det voksende antal tjenester bag det."
+    >
+      Vipps
+    </button>
+
+    kommer til at repræsentere alle vores funktioner.
+
+  </p>
+
+
+  <p>
+
+    Vi valgte navnet Vipps og det
+
+    <button
+      class="term"
+      type="button"
+      data-title="Det glade smiley-ansigt"
+      data-explanation="Smileyen giver Vipps-identiteten et venligt og genkendeligt udtryk, som kan fungere på tværs af de nordiske markeder."
+    >
+      glade smiley-ansigt
+    </button>.
+
+    Vi beholder den
+
+    <button
+      class="term"
+      type="button"
+      data-title="Den blå farve bliver"
+      data-explanation="Ved at beholde den velkendte blå farve skaber vi kontinuitet mellem MobilePay og den nye fælles Vipps-identitet."
+    >
+      blå farve
+    </button>,
+
+    og den app, du kender og holder af,
+    forsvinder ikke.
+
+    Du har måske brug for lidt tid
+    til at vænne dig til det nye navn,
+
+    og tro os,
+    det har vi også!
+
+  </p>
+
+
+  <p>
+
+    Vi håber, at du vil med på rejsen.
+
+    For når alt kommer til alt,
+    handler det om
+
+    <button
+      class="term"
+      type="button"
+      data-title="Forenkling"
+      data-explanation="Ét fælles nordisk brand og én produktretning kan reducere kompleksiteten for virksomheder, der opererer på tværs af flere markeder."
+    >
+      forenkling
+    </button>
+
+    for de nordiske virksomheder
+
+    og meget, meget nemme
+
+    <button
+      class="term"
+      type="button"
+      data-title="Nordiske overførsler"
+      data-explanation="Målet er at gøre det lige så enkelt at sende og modtage penge på tværs af de nordiske markeder som en almindelig lokal betaling."
+    >
+      nordiske overførsler
+    </button>
+
+    for brugerne.
+
+  </p>
+
+</div>
+
+
+    <!-- =====================================
+         TOOLTIP
+         ===================================== -->
+
+    <aside
+      class="tooltip-card"
+      id="tooltip"
+      aria-hidden="true"
+    >
+
+      <button
+        class="tooltip-close"
+        type="button"
+        aria-label="Close explanation"
+      >
+        ×
+      </button>
+
+      <h2></h2>
+
+      <p></p>
+
+    </aside>
+
+
+  </main>
+
+
+  <script>
+
+    /* =========================================================
+       ELEMENTS
+       ========================================================= */
+
+    const tooltip =
+      document.getElementById("tooltip");
+
+    const tooltipTitle =
+      tooltip.querySelector("h2");
+
+    const tooltipText =
+      tooltip.querySelector("p");
+
+    const tooltipClose =
+      tooltip.querySelector(".tooltip-close");
+
+    const terms =
+      [...document.querySelectorAll(".term")];
+
+    let activeTerm = null;
+    let closeTimer = null;
+
+
+    /* =========================================================
+       POSITION TOOLTIP
+       ========================================================= */
+
+    function positionTooltip(target) {
+
+      /*
+       * Mobile uses the CSS centered modal position.
+       */
+
+      if (
+        window.matchMedia("(max-width: 600px)").matches
+      ) {
+
+        tooltip.style.left = "50%";
+        tooltip.style.top = "50%";
+
+        return;
+      }
+
+
+      const rect =
+        target.getBoundingClientRect();
+
+
+      const tooltipWidth =
+        tooltip.offsetWidth || 320;
+
+      const tooltipHeight =
+        tooltip.offsetHeight || 230;
+
+
+      const padding = 20;
+      const gap = 28;
+
+
+      /*
+       * Try right side first.
+       */
+
+      let left =
+        rect.right + gap;
+
+
+      let top =
+        rect.top +
+        rect.height / 2 -
+        tooltipHeight / 2;
+
+
+      /*
+       * If it doesn't fit on the right,
+       * move to the left.
+       */
+
+      if (
+        left + tooltipWidth >
+        window.innerWidth - padding
+      ) {
+
+        left =
+          rect.left -
+          tooltipWidth -
+          gap;
+
+      }
+
+
+      /*
+       * If there isn't enough room on either
+       * side, center it horizontally.
+       */
+
+      if (left < padding) {
+
+        left =
+          (window.innerWidth -
+          tooltipWidth) / 2;
+
+      }
+
+
+      /*
+       * Keep the card inside the viewport.
+       */
+
+      top =
+        Math.max(
+          padding,
+          Math.min(
+            top,
+            window.innerHeight -
+            tooltipHeight -
+            padding
+          )
+        );
+
+
+      tooltip.style.left =
+        `${left}px`;
+
+      tooltip.style.top =
+        `${top}px`;
+
+    }
+
+
+    /* =========================================================
+       OPEN TOOLTIP
+       ========================================================= */
+
+    function openTooltip(target) {
+
+      clearTimeout(closeTimer);
+
+      activeTerm = target;
+
+
+      tooltipTitle.textContent =
+        target.dataset.title;
+
+
+      tooltipText.textContent =
+        target.dataset.explanation;
+
+
+      tooltip.classList.add("is-open");
+
+
+      tooltip.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+
+
+      requestAnimationFrame(() => {
+
+        positionTooltip(target);
+
+      });
+
+    }
+
+
+    /* =========================================================
+       CLOSE TOOLTIP
+       ========================================================= */
+
+    function closeTooltip() {
+
+      clearTimeout(closeTimer);
+
+
+      tooltip.classList.remove(
+        "is-open"
+      );
+
+
+      tooltip.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+
+      activeTerm = null;
+
+    }
+
+
+    /* =========================================================
+       DELAYED CLOSE
+       ========================================================= */
+
+    function scheduleClose() {
+
+      clearTimeout(closeTimer);
+
+
+      closeTimer =
+        setTimeout(
+          closeTooltip,
+          130
+        );
+
+    }
+
+
+    /* =========================================================
+       TERM EVENTS
+       ========================================================= */
+
+    terms.forEach(term => {
+
+
+      /* Desktop hover */
+
+      term.addEventListener(
+        "mouseenter",
+        () => openTooltip(term)
+      );
+
+
+      term.addEventListener(
+        "mouseleave",
+        scheduleClose
+      );
+
+
+      /* Keyboard */
+
+      term.addEventListener(
+        "focus",
+        () => openTooltip(term)
+      );
+
+
+      term.addEventListener(
+        "blur",
+        scheduleClose
+      );
+
+
+      /* Touch / click */
+
+      term.addEventListener(
+        "click",
+        event => {
+
+          event.stopPropagation();
+
+          openTooltip(term);
+
+        }
+      );
+
+    });
+
+
+    /* =========================================================
+       KEEP TOOLTIP OPEN WHILE HOVERING IT
+       ========================================================= */
+
+    tooltip.addEventListener(
+      "mouseenter",
+      () => clearTimeout(closeTimer)
+    );
+
+
+    tooltip.addEventListener(
+      "mouseleave",
+      scheduleClose
+    );
+
+
+    /* =========================================================
+       CLOSE BUTTON
+       ========================================================= */
+
+    tooltipClose.addEventListener(
+      "click",
+      event => {
+
+        event.stopPropagation();
+
+        closeTooltip();
+
+      }
+    );
+
+
+    /* =========================================================
+       CLICK OUTSIDE
+       ========================================================= */
+
+    document.addEventListener(
+      "click",
+      event => {
+
+        if (
+          !tooltip.contains(event.target) &&
+          !event.target.closest(".term")
+        ) {
+
+          closeTooltip();
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       ESCAPE
+       ========================================================= */
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        if (event.key === "Escape") {
+
+          closeTooltip();
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       RESIZE
+       ========================================================= */
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        if (activeTerm) {
+
+          positionTooltip(activeTerm);
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       SCROLL
+       ========================================================= */
+
+    window.addEventListener(
+      "scroll",
+      () => {
+
+        if (activeTerm) {
+
+          positionTooltip(activeTerm);
+
+        }
+
+      },
+      {
+        passive: true
+      }
+    );
+
+  </script>
+
+</body>
+</html>
