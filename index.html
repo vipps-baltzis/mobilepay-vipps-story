@@ -10,16 +10,39 @@
 
   <title>MobilePay skifter navn til Vipps</title>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500&display=swap"
-    rel="stylesheet"
-  >
-
   <style>
+
+    @font-face {
+      font-family: "Very Very Sans Display";
+      src: url("./fonts/VeryVerySansDisplay-Medium.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Very Very Sans Display";
+      src: url("./fonts/VeryVerySansDisplay-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Very Very Sans Text";
+      src: url("./fonts/VeryVerySans.woff2") format("woff2");
+      font-weight: 400 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Very Very Sans Text";
+      src: url("./fonts/VeryVerySansText-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
 
     /* =========================================================
        VARIABLES
@@ -62,7 +85,7 @@
       color: var(--white);
 
       font-family:
-        "Inter",
+        "Very Very Sans Text",
         system-ui,
         -apple-system,
         BlinkMacSystemFont,
@@ -179,6 +202,10 @@
     .brand-change-text {
       flex-shrink: 0;
 
+      font-family:
+        "Very Very Sans Display",
+        sans-serif;
+
       font-size: clamp(
         12px,
         1.45vw,
@@ -200,6 +227,10 @@
        ========================================================= */
 
     .hero-title {
+      font-family:
+        "Very Very Sans Display",
+        sans-serif;
+
       margin:
         0
         0
@@ -234,9 +265,8 @@
       margin: 0 auto;
 
       font-family:
-        "Playfair Display",
-        Georgia,
-        serif;
+        "Very Very Sans Text",
+        sans-serif;
 
       font-size: clamp(
         17px,
@@ -378,7 +408,7 @@
         13px;
 
       font-family:
-        "Inter",
+        "Very Very Sans Display",
         sans-serif;
 
       font-size: 24px;
@@ -397,9 +427,8 @@
       margin: 0;
 
       font-family:
-        "Playfair Display",
-        Georgia,
-        serif;
+        "Very Very Sans Text",
+        sans-serif;
 
       font-size: 15px;
 
@@ -455,6 +484,10 @@
     }
 
     .language-toggle button {
+      font-family:
+        "Very Very Sans Text",
+        sans-serif;
+
       border: 0;
       border-radius: 999px;
       padding: 7px 11px;
@@ -706,6 +739,7 @@
     <div class="language-toggle" aria-label="Vælg sprog">
       <button type="button" class="language-button is-active" data-language="da" aria-pressed="true">DA</button>
       <button type="button" class="language-button" data-language="en" aria-pressed="false">EN</button>
+      <button type="button" class="language-button" data-language="fi" aria-pressed="false">FI</button>
     </div>
 
     <div class="content">
@@ -723,7 +757,7 @@
           class="mobilepay-logo"
         >
 
-        <span class="brand-change-text" data-da="skifter navn til" data-en="is changing its name to">
+        <span class="brand-change-text" data-da="skifter navn til" data-en="is changing its name to" data-fi="vaihtaa nimekseen">
           skifter navn til
         </span>
 
@@ -740,7 +774,7 @@
            TITLE
            ===================================== -->
 
-      <h1 class="hero-title" data-da="Hvorfor?" data-en="Why?">
+      <h1 class="hero-title" data-da="Hvorfor?" data-en="Why?" data-fi="Miksi?">
         Hvorfor?
       </h1>
 
@@ -1091,6 +1125,141 @@
             Nordic transfers
           </button>
           for the users.
+        </p>
+
+      </div>
+
+      <div class="story language-version" data-language-version="fi" hidden>
+
+        <p>
+          MobilePay oli lähes
+          <button class="term" type="button"
+            data-title="Välitön menestys"
+            data-explanation="MobilePaysta tuli nopeasti osa arkea. Mitä useampi latasi sovelluksen, sitä arvokkaammaksi palvelu muuttui kaikille.">
+            välitön menestys
+          </button>
+          lanseerauksestaan vuonna 2013 lähtien.
+
+          Aina kun tanskalainen, ja myöhemmin suomalainen,
+          latasi sovelluksen, sen hyötyarvo
+          kasvoi eksponentiaalisesti.
+
+          Ja katsokaa meitä nyt:
+          lähes kaikki käyttävät MobilePayta.
+
+          Ei hullummin!
+        </p>
+
+        <p>
+          Mutta tulevaisuus tuo enemmän
+          <button class="term" type="button"
+            data-title="Lisää kilpailua"
+            data-explanation="Maksumarkkina muuttuu jatkuvasti kilpailullisemmaksi, etenkin kun suuret kansainväliset teknologiayhtiöt investoivat yhä enemmän digitaalisiin maksupalveluihin.">
+            kilpailua
+          </button>
+          kuin koskaan ennen, erityisesti yhdysvaltalaisilta teknologiajäteiltä,
+          joilla on syvät taskut ja vielä suuremmat tavoitteet.
+
+          Jotta onnistumme tavoitteessamme
+          tulla
+          <button class="term" type="button"
+            data-title="Pohjoismainen vaihtoehto"
+            data-explanation="Tavoitteenamme on rakentaa vahva pohjoismainen vaihtoehto: maksukokemus, joka on tehty pohjoismaisille käyttäjille, yrityksille ja markkinoille.">
+            pohjoismaiseksi vaihtoehdoksi
+          </button>,
+          meidän on yhdistyttävä
+          <button class="term" type="button"
+            data-title="Yhden brändin alle"
+            data-explanation="Yhteinen brändi tekee tuotteesta helpommin tunnistettavan eri markkinoilla ja antaa meille yhden vahvan identiteetin tulevia palveluita varten.">
+            yhden brändin alle
+          </button>.
+
+          Meidän täytyy muuttua, jotta voimme säilyttää olennaisen.
+        </p>
+
+        <p>
+          Vuonna 2022
+          <button class="term" type="button"
+            data-title="Yhdistimme voimamme"
+            data-explanation="MobilePay ja Vipps yhdistivät voimansa rakentaakseen yhdessä jotain vahvempaa ja edetäkseen kohti yhteistä pohjoismaista maksukokemusta.">
+            yhdistimme voimamme
+          </button>
+          norjalaisen Vippsin kanssa rakentaaksemme jotain
+          suurempaa ja parempaa:
+
+          vahvan
+          <button class="term" type="button"
+            data-title="Pohjoismainen sovellus"
+            data-explanation="Yksi sovellus ja yksi yhteinen suunta voivat luoda yksinkertaisemman ja tunnistettavamman kokemuksen Pohjoismaissa.">
+            pohjoismaisen sovelluksen
+          </button>.
+
+          Nyt menemme täysillä eteenpäin ja luomme
+          <button class="term" type="button"
+            data-title="Yksi yhteinen pohjoismainen nimi"
+            data-explanation="Yksi yhteinen nimi Pohjoismaissa tekee kokonaiskokemuksesta yksinkertaisemman sekä käyttäjille että yrityksille.">
+            yhden yhteisen pohjoismaisen nimen
+          </button>,
+          jonka voit kohdata Tanskassa,
+          Norjassa, Suomessa, Ruotsissa ja Grönlannissa,
+
+          ja kuka tietää,
+          ehkä vielä useammassa maassa tulevaisuudessa!
+
+          Meistä tulee paljon enemmän
+          kuin pelkkä mobiilimaksupalvelu,
+
+          ja nimi
+          <button class="term" type="button"
+            data-title="Vipps"
+            data-explanation="Vippsista tulee yhteinen nimi, joka edustaa yhdistettyä pohjoismaista tuotetta ja sen kasvavaa palveluvalikoimaa.">
+            Vipps
+          </button>
+          tulee edustamaan kaikkia ominaisuuksiamme.
+        </p>
+
+        <p>
+          Valitsimme nimeksi Vipps ja
+          <button class="term" type="button"
+            data-title="Iloinen hymiö"
+            data-explanation="Hymiö antaa Vipps-identiteetille ystävällisen ja helposti tunnistettavan ilmeen, joka toimii yhtenäisesti Pohjoismaissa.">
+            iloisen hymiön
+          </button>.
+
+          Säilytämme myös
+          <button class="term" type="button"
+            data-title="Sininen väri säilyy"
+            data-explanation="Tuttu sininen väri luo jatkuvuutta MobilePayn ja uuden yhteisen Vipps-identiteetin välille.">
+            sinisen värin
+          </button>,
+
+          eikä tuntemasi ja rakastamasi sovellus
+          ole katoamassa mihinkään.
+
+          Uuteen nimeen tottuminen voi viedä hieman aikaa,
+
+          ja usko pois,
+          niin meilläkin!
+        </p>
+
+        <p>
+          Toivomme, että tulet mukaan matkalle.
+
+          Loppujen lopuksi tässä on kyse
+          <button class="term" type="button"
+            data-title="Yksinkertaistamisesta"
+            data-explanation="Yksi yhteinen pohjoismainen brändi ja tuotesuunta voivat vähentää monilla markkinoilla toimivien yritysten monimutkaisuutta.">
+            yksinkertaistamisesta
+          </button>
+          pohjoismaisille yrityksille
+
+          ja erittäin, erittäin helpoista
+          <button class="term" type="button"
+            data-title="Pohjoismaiset siirrot"
+            data-explanation="Tavoitteena on tehdä rahan lähettämisestä ja vastaanottamisesta Pohjoismaiden välillä yhtä helppoa kuin tavallisesta paikallisesta maksusta.">
+            pohjoismaisista siirroista
+          </button>
+          käyttäjille.
         </p>
 
       </div>
