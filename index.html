@@ -433,6 +433,49 @@
     }
 
 
+
+    /* =========================================================
+       LANGUAGE TOGGLE
+       ========================================================= */
+
+    .language-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px;
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .language-toggle button {
+      border: 0;
+      border-radius: 999px;
+      padding: 7px 11px;
+      background: transparent;
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .16s ease, color .16s ease;
+    }
+
+    .language-toggle button.is-active {
+      background: var(--white);
+      color: var(--mobilepay-blue);
+    }
+
+    .language-version[hidden] {
+      display: none;
+    }
+
+
     /* =========================================================
        TABLET
        ========================================================= */
@@ -483,6 +526,16 @@
        ========================================================= */
 
     @media (max-width: 600px) {
+
+      .language-toggle {
+        top: 12px;
+        right: 12px;
+      }
+
+      .language-toggle button {
+        padding: 6px 9px;
+        font-size: 11px;
+      }
 
       .content {
         width:
@@ -650,6 +703,11 @@
 
   <main class="page">
 
+    <div class="language-toggle" aria-label="Vælg sprog">
+      <button type="button" class="language-button is-active" data-language="da" aria-pressed="true">DA</button>
+      <button type="button" class="language-button" data-language="en" aria-pressed="false">EN</button>
+    </div>
+
     <div class="content">
 
 
@@ -665,7 +723,7 @@
           class="mobilepay-logo"
         >
 
-        <span class="brand-change-text">
+        <span class="brand-change-text" data-da="skifter navn til" data-en="is changing its name to">
           skifter navn til
         </span>
 
@@ -682,7 +740,7 @@
            TITLE
            ===================================== -->
 
-      <h1 class="hero-title">
+      <h1 class="hero-title" data-da="Hvorfor?" data-en="Why?">
         Hvorfor?
       </h1>
 
@@ -691,7 +749,7 @@
            STORY
            ===================================== -->
 
-      <div class="story">
+      <div class="story language-version" data-language-version="da">
 
   <p>
 
@@ -898,6 +956,144 @@
   </p>
 
 </div>
+
+      <div class="story language-version" data-language-version="en" hidden>
+
+        <p>
+          MobilePay was an almost
+          <button class="term" type="button"
+            data-title="Instant success"
+            data-explanation="MobilePay quickly became part of everyday life. As more people downloaded the app, the value of the service increased for everyone.">
+            instant success
+          </button>
+          when we launched in 2013.
+
+          Every time a Dane, and later a Finn,
+          downloaded the app, the utility value
+          grew exponentially.
+
+          And look at us now:
+          pretty much everyone uses MobilePay.
+
+          Not bad!
+        </p>
+
+        <p>
+          But the future brings more
+          <button class="term" type="button"
+            data-title="More competition"
+            data-explanation="The payments market is becoming increasingly competitive, especially as large global technology companies continue investing in digital payment products.">
+            competition
+          </button>
+          than ever, especially from the US tech giants
+          who have deep pockets and even deeper ambitions.
+
+          In order to succeed in our ambition
+          to become the
+          <button class="term" type="button"
+            data-title="The Nordic alternative"
+            data-explanation="Our ambition is to create a strong Nordic alternative: a payment experience built around Nordic users, merchants and markets.">
+            Nordic alternative
+          </button>
+          we need to gather under
+          <button class="term" type="button"
+            data-title="One brand"
+            data-explanation="A shared brand makes the product easier to recognise across markets and gives us one strong identity for future services.">
+            one brand
+          </button>.
+
+          We need to change to preserve.
+        </p>
+
+        <p>
+          In 2022 we
+          <button class="term" type="button"
+            data-title="Joined forces"
+            data-explanation="MobilePay and Vipps joined forces to create something stronger together and build towards a shared Nordic payment experience.">
+            joined forces
+          </button>
+          with Norwegian Vipps to build something
+          bigger and better:
+
+          a strong,
+          <button class="term" type="button"
+            data-title="A Nordic app"
+            data-explanation="One app and one shared direction can create a simpler and more recognisable experience across Nordic countries.">
+            Nordic app
+          </button>.
+
+          And now we are going all in,
+          creating
+          <button class="term" type="button"
+            data-title="One shared Nordic name"
+            data-explanation="Using one shared name across Nordic markets simplifies the overall experience for both users and merchants.">
+            one shared Nordic name
+          </button>
+          that you can meet in Denmark,
+          Norway, Finland, Sweden and Greenland,
+
+          and who knows,
+          maybe even more countries down the line!
+
+          We will become something much more
+          than just mobile payments
+
+          and the name
+          <button class="term" type="button"
+            data-title="Vipps"
+            data-explanation="Vipps becomes the shared name representing the combined Nordic product and the growing number of services behind it.">
+            Vipps
+          </button>
+          will represent all of our features.
+        </p>
+
+        <p>
+          We chose the name Vipps and the
+          <button class="term" type="button"
+            data-title="The happy smiley face"
+            data-explanation="The smiley gives the Vipps identity a friendly and recognisable expression that can work consistently across the Nordic markets.">
+            happy smiley face
+          </button>.
+
+          We are keeping the
+          <button class="term" type="button"
+            data-title="The blue stays"
+            data-explanation="Keeping the familiar blue creates continuity between MobilePay and the new shared Vipps identity.">
+            colour blue
+          </button>,
+
+          and the app you know and love
+          is not going anywhere.
+
+          You may need a little time
+          to get used to the new name,
+
+          and trust us,
+          so do we!
+        </p>
+
+        <p>
+          We hope you will come along for the ride.
+
+          Because at the end of the day,
+          this is all about
+          <button class="term" type="button"
+            data-title="Simplification"
+            data-explanation="A single Nordic brand and product direction can reduce complexity for merchants operating across multiple markets.">
+            simplification
+          </button>
+          for the Nordic merchants
+
+          and very, very easy
+          <button class="term" type="button"
+            data-title="Nordic transfers"
+            data-explanation="The goal is to make sending and receiving money across Nordic markets feel as simple as a normal local payment.">
+            Nordic transfers
+          </button>
+          for the users.
+        </p>
+
+      </div>
 
 
     <!-- =====================================
@@ -1260,6 +1456,67 @@
 
       }
     );
+
+
+
+    /* =========================================================
+       LANGUAGE TOGGLE
+       ========================================================= */
+
+    const languageButtons =
+      [...document.querySelectorAll(".language-button")];
+
+    const languageVersions =
+      [...document.querySelectorAll("[data-language-version]")];
+
+    const brandChangeText =
+      document.querySelector(".brand-change-text");
+
+    const heroTitle =
+      document.querySelector(".hero-title");
+
+
+    function setLanguage(language) {
+
+      closeTooltip();
+
+      languageVersions.forEach(version => {
+        version.hidden =
+          version.dataset.languageVersion !== language;
+      });
+
+      languageButtons.forEach(button => {
+        const isActive =
+          button.dataset.language === language;
+
+        button.classList.toggle(
+          "is-active",
+          isActive
+        );
+
+        button.setAttribute(
+          "aria-pressed",
+          String(isActive)
+        );
+      });
+
+      brandChangeText.textContent =
+        brandChangeText.dataset[language];
+
+      heroTitle.textContent =
+        heroTitle.dataset[language];
+
+      document.documentElement.lang =
+        language;
+    }
+
+
+    languageButtons.forEach(button => {
+      button.addEventListener(
+        "click",
+        () => setLanguage(button.dataset.language)
+      );
+    });
 
 
     /* =========================================================
