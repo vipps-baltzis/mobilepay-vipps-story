@@ -1,0 +1,956 @@
+@font-face {
+      font-family: "Very Very Sans Display";
+      src: url("./fonts/VeryVerySansDisplay-Medium.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Very Very Sans Display";
+      src: url("./fonts/VeryVerySansDisplay-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Very Very Sans Text";
+      src: url("./fonts/VeryVerySans.woff2") format("woff2");
+      font-weight: 400 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Very Very Sans Text";
+      src: url("./fonts/VeryVerySansText-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* =========================================================
+       VARIABLES
+       ========================================================= */
+
+:root {
+  --mobilepay-blue: #5873f8;
+  --mobilepay-blue-dark: #4d67ec;
+
+  --mobilepay-yellow: #D0FA7D;
+
+  --white: #ffffff;
+  --black: #7A590C;
+
+  --content-width: 580px;
+}
+
+
+    /* =========================================================
+       RESET
+       ========================================================= */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+
+      min-height: 100vh;
+
+      background: var(--mobilepay-blue);
+
+      color: var(--white);
+
+      font-family:
+        "Very Very Sans Text",
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+
+    /* =========================================================
+       FULL PAGE
+       ========================================================= */
+
+    .page {
+      position: relative;
+
+      width: 100%;
+      min-height: 100vh;
+
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 50% 10%,
+          rgba(255,255,255,.06),
+          transparent 34%
+        ),
+        linear-gradient(
+          to bottom,
+          var(--mobilepay-blue) 0%,
+          var(--mobilepay-blue) 48%,
+          var(--mobilepay-blue-dark) 100%
+        );
+    }
+
+
+    /* =========================================================
+       MAIN CONTENT
+       ========================================================= */
+
+    .content {
+      position: relative;
+      z-index: 2;
+
+      width: min(
+        calc(100% - 48px),
+        760px
+      );
+
+      margin: 0 auto;
+
+      padding:
+        clamp(60px, 8vw, 110px)
+        0
+        clamp(90px, 10vw, 150px);
+    }
+
+
+    /* =========================================================
+       BRAND HEADER
+       ========================================================= */
+
+    .brand-change {
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      gap: clamp(10px, 1vw, 20px);
+
+      margin-bottom:
+        clamp(45px, 6vw, 80px);
+    }
+
+
+    /* =========================================================
+       LOGOS
+       ========================================================= */
+
+    .mobilepay-logo,
+    .vipps-logo {
+      display: block;
+
+      width: auto;
+
+      object-fit: contain;
+
+      flex-shrink: 0;
+    }
+
+
+    /*
+     * The two logo files have different proportions
+     * and internal whitespace.
+     *
+     * Matching them by height instead of width makes
+     * them appear visually much closer in size.
+     */
+
+    .mobilepay-logo {
+      height: clamp(22px, 2.8vw, 38px);
+    }
+
+    .vipps-logo {
+      height: clamp(18px, 2vw, 30px); 
+    }
+
+
+    /* Small text between logos */
+
+    .brand-change-text {
+      flex-shrink: 0;
+
+      font-family:
+        "Very Very Sans Display",
+        sans-serif;
+
+      font-size: clamp(
+        12px,
+        1.45vw,
+        18px
+      );
+
+      font-weight: 500;
+
+      line-height: 1;
+
+      color: rgba(255,255,255,.96);
+
+      white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       MAIN TITLE
+       ========================================================= */
+
+    .hero-title {
+      font-family:
+        "Very Very Sans Display",
+        sans-serif;
+
+      margin:
+        0
+        0
+        clamp(35px, 4vw, 55px);
+
+      text-align: center;
+
+      font-size: clamp(
+        50px,
+        7vw,
+        92px
+      );
+
+      line-height: .94;
+
+      letter-spacing: -.055em;
+
+      font-weight: 600;
+    }
+
+
+    /* =========================================================
+       STORY
+       ========================================================= */
+
+    .story {
+      width: min(
+        100%,
+        var(--content-width)
+      );
+
+      margin: 0 auto;
+
+      font-family:
+        "Very Very Sans Text",
+        sans-serif;
+
+      font-size: clamp(
+        17px,
+        1.55vw,
+        22px
+      );
+
+      line-height: 1.37;
+
+      text-align: center;
+
+      color: rgba(255,255,255,.97);
+    }
+
+
+    .story p {
+      margin:
+        0
+        0
+        clamp(38px, 5vw, 62px);
+    }
+
+
+    .story p:last-child {
+      margin-bottom: 0;
+    }
+
+
+    /* =========================================================
+       INTERACTIVE WORDS
+       ========================================================= */
+
+    .term {
+      appearance: none;
+
+      display: inline;
+
+      margin: 0;
+      padding: 0;
+
+      border: 0;
+
+      border-bottom:
+        1px dashed
+        rgba(255,255,255,.9);
+
+      background: transparent;
+
+      color: inherit;
+
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+
+      cursor: help;
+
+      transition:
+        opacity .18s ease,
+        border-color .18s ease;
+    }
+
+
+    .term:hover,
+    .term:focus-visible {
+      opacity: .7;
+
+      border-bottom-color:
+        rgba(255,255,255,1);
+
+      outline: none;
+    }
+
+
+    /* =========================================================
+       TOOLTIP
+       ========================================================= */
+
+    .tooltip-card {
+      position: fixed;
+
+      z-index: 50;
+
+      width: min(
+        320px,
+        calc(100vw - 32px)
+      );
+
+      padding:
+        38px
+        32px
+        32px;
+
+      background:
+        var(--mobilepay-yellow);
+
+      color:
+        var(--black);
+
+      box-shadow:
+        0 22px 45px
+        rgba(0,0,0,.30);
+
+      opacity: 0;
+
+      visibility: hidden;
+
+      pointer-events: none;
+
+      transform:
+        translateY(10px)
+        scale(.97);
+
+      transition:
+        opacity .16s ease,
+        transform .16s ease,
+        visibility .16s ease;
+    }
+
+
+    .tooltip-card.is-open {
+      opacity: 1;
+
+      visibility: visible;
+
+      pointer-events: auto;
+
+      transform:
+        translateY(0)
+        scale(1);
+    }
+
+
+    /* Tooltip title */
+
+    .tooltip-card h2 {
+      margin:
+        0
+        0
+        13px;
+
+      font-family:
+        "Very Very Sans Display",
+        sans-serif;
+
+      font-size: 24px;
+
+      line-height: 1.05;
+
+      letter-spacing: -.035em;
+
+      font-weight: 700;
+    }
+
+
+    /* Tooltip text */
+
+    .tooltip-card p {
+      margin: 0;
+
+      font-family:
+        "Very Very Sans Text",
+        sans-serif;
+
+      font-size: 15px;
+
+      line-height: 1.28;
+
+      text-align: left;
+    }
+
+
+    /* Close button */
+
+    .tooltip-close {
+      position: absolute;
+
+      top: 9px;
+      right: 12px;
+
+      padding: 0;
+
+      border: 0;
+
+      background: none;
+
+      color: var(--black);
+
+      font-size: 27px;
+
+      line-height: 1;
+
+      cursor: pointer;
+    }
+
+
+
+    /* =========================================================
+       LANGUAGE TOGGLE
+       ========================================================= */
+
+    .language-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px;
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .language-toggle button {
+      font-family:
+        "Very Very Sans Text",
+        sans-serif;
+
+      border: 0;
+      border-radius: 999px;
+      padding: 7px 11px;
+      background: transparent;
+      color: rgba(255,255,255,.72);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .16s ease, color .16s ease;
+    }
+
+    .language-toggle button.is-active {
+      background: var(--white);
+      color: var(--mobilepay-blue);
+    }
+
+    .language-version[hidden] {
+      display: none;
+    }
+
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+      :root {
+        --content-width: 560px;
+      }
+
+
+      .content {
+        width: min(
+          calc(100% - 40px),
+          700px
+        );
+
+        padding-top: 55px;
+      }
+
+
+      .brand-change {
+        margin-bottom: 50px;
+      }
+
+
+      .hero-title {
+        margin-bottom: 40px;
+      }
+
+
+      .story {
+        font-size:
+          clamp(
+            16px,
+            2.3vw,
+            20px
+          );
+
+        line-height: 1.4;
+      }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 600px) {
+
+      .language-toggle {
+        top: 12px;
+        right: 12px;
+      }
+
+      .language-toggle button {
+        padding: 6px 9px;
+        font-size: 11px;
+      }
+
+      .content {
+        width:
+          calc(100% - 32px);
+
+        padding:
+          92px
+          0
+          80px;
+      }
+
+
+      .brand-change {
+        gap: 10px;
+
+        margin-bottom: 42px;
+      }
+
+
+      /*
+       * Matching by visual height gives both logos
+       * a more balanced appearance on mobile.
+       */
+
+      .mobilepay-logo {
+        width: auto;
+        height: 28px;
+      }
+
+
+      .vipps-logo {
+        width: auto;
+        height: 27px;
+      }
+
+
+      .brand-change-text {
+        font-size: 10px;
+      }
+
+
+      .hero-title {
+        margin-bottom: 34px;
+
+        font-size:
+          clamp(
+            46px,
+            14vw,
+            66px
+          );
+
+        line-height: .94;
+      }
+
+
+      .story {
+        width: 91%;
+
+        font-size:
+          clamp(
+            15px,
+            4.2vw,
+            18px
+          );
+
+        line-height: 1.38;
+      }
+
+
+      .story p {
+        margin-bottom: 38px;
+      }
+
+
+      /*
+       * Tooltip becomes centered on mobile.
+       */
+
+      .tooltip-card {
+        left: 50% !important;
+        top: 50% !important;
+
+        width:
+          min(
+            330px,
+            calc(100vw - 28px)
+          );
+
+        transform:
+          translate(
+            -50%,
+            calc(-50% + 10px)
+          )
+          scale(.97);
+      }
+
+
+      .tooltip-card.is-open {
+        transform:
+          translate(-50%, -50%)
+          scale(1);
+      }
+
+    }
+
+
+    /* =========================================================
+       VERY SMALL PHONES
+       ========================================================= */
+
+    @media (max-width: 380px) {
+
+      .brand-change {
+        gap: 7px;
+      }
+
+
+      .mobilepay-logo {
+        width: auto;
+        height: 24px;
+      }
+
+
+      .vipps-logo {
+        width: auto;
+        height: 23px;
+      }
+
+
+      .brand-change-text {
+        font-size: 8px;
+      }
+
+
+      .story {
+        width: 94%;
+
+        font-size: 15px;
+      }
+
+    }
+
+
+
+    /* =========================================================
+   VIDEO SECTION
+   ========================================================= */
+
+.video-section {
+  width: 100%;
+  background: #ffffff;
+  padding:
+    clamp(48px, 7vw, 96px)
+    clamp(16px, 4vw, 48px);
+}
+
+.video-wrap {
+  width: min(50%, 600px);
+  margin: 0 auto;
+}
+
+.video-wrap video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+  border-radius: clamp(12px, 1.5vw, 22px);
+  object-fit: cover;
+  background: #ffffff;
+}
+
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+
+        transition: none !important;
+      }
+
+    }
+
+
+/* =========================================================
+   SHARED NAVIGATION
+   ========================================================= */
+.site-nav {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.site-nav a {
+  display: block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: rgba(255,255,255,.78);
+  font-family: "Very Very Sans Text", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .16s ease, color .16s ease;
+}
+
+.site-nav a:hover { color: #fff; }
+.site-nav a.is-active { background: #fff; color: var(--mobilepay-blue); }
+
+.language-toggle,
+.site-nav { transition: background .18s ease, border-color .18s ease; }
+.language-toggle.on-light,
+.site-nav.on-light {
+  border-color: rgba(88,115,248,.28);
+  background: rgba(255,255,255,.86);
+  box-shadow: 0 5px 22px rgba(20,30,70,.08);
+}
+.language-toggle.on-light button { color: rgba(88,115,248,.62); }
+.language-toggle.on-light button.is-active { background: var(--mobilepay-blue); color: #fff; }
+.site-nav.on-light a { color: rgba(88,115,248,.66); }
+.site-nav.on-light a:hover { color: var(--mobilepay-blue); }
+.site-nav.on-light a.is-active { background: var(--mobilepay-blue); color: #fff; }
+
+/* =========================================================
+   FAQ PAGE
+   ========================================================= */
+.faq-page {
+  min-height: 100vh;
+  background: #fff;
+  color: #171717;
+}
+
+.faq-shell {
+  width: min(calc(100% - 48px), 900px);
+  margin: 0 auto;
+  padding: clamp(120px, 12vw, 180px) 0 clamp(90px, 10vw, 150px);
+}
+
+.faq-kicker {
+  margin: 0 0 18px;
+  color: var(--mobilepay-blue);
+  font-family: "Very Very Sans Display", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.faq-title {
+  margin: 0 auto 24px;
+  max-width: 760px;
+  color: var(--mobilepay-blue);
+  font-family: "Very Very Sans Display", sans-serif;
+  font-size: clamp(52px, 8vw, 100px);
+  font-weight: 700;
+  line-height: .92;
+  letter-spacing: -.055em;
+  text-align: center;
+}
+
+.faq-intro {
+  max-width: 620px;
+  margin: 0 auto clamp(56px, 8vw, 90px);
+  color: #5d5d5d;
+  font-size: clamp(17px, 1.8vw, 21px);
+  line-height: 1.4;
+  text-align: center;
+}
+
+.faq-section-title {
+  margin: 54px 0 16px;
+  color: var(--mobilepay-blue);
+  font-family: "Very Very Sans Display", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.faq-list { border-top: 1px solid #dedede; }
+
+.faq-item {
+  border-bottom: 1px solid #dedede;
+  transition: background .18s ease;
+}
+
+.faq-item[open] { background: #f8f9ff; }
+
+.faq-question {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 42px 1fr 32px;
+  gap: 14px;
+  align-items: center;
+  padding: 24px 12px;
+  cursor: pointer;
+  color: #1a1a1a;
+  font-family: "Very Very Sans Display", sans-serif;
+  font-size: clamp(18px, 2.1vw, 24px);
+  font-weight: 500;
+  line-height: 1.16;
+}
+.faq-question::-webkit-details-marker { display: none; }
+
+.faq-number {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #D0FA7D;
+  color: #7A590C;
+  font-family: "Very Very Sans Text", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.faq-plus {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  justify-self: end;
+}
+.faq-plus::before,
+.faq-plus::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--mobilepay-blue);
+  transform: translate(-50%,-50%);
+  transition: transform .2s ease;
+}
+.faq-plus::after { transform: translate(-50%,-50%) rotate(90deg); }
+.faq-item[open] .faq-plus::after { transform: translate(-50%,-50%) rotate(0deg); }
+
+.faq-answer {
+  padding: 0 58px 28px 68px;
+  color: #4c4c4c;
+  font-family: "Very Very Sans Text", sans-serif;
+  font-size: clamp(16px, 1.5vw, 19px);
+  line-height: 1.52;
+}
+.faq-answer p { margin: 0 0 14px; }
+.faq-answer p:last-child { margin-bottom: 0; }
+
+.faq-footer {
+  margin-top: 70px;
+  text-align: center;
+}
+.faq-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--mobilepay-blue);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 600px) {
+  .site-nav { top: 12px; left: 12px; }
+  .site-nav a { padding: 6px 9px; font-size: 11px; }
+  .faq-shell { width: calc(100% - 28px); padding-top: 112px; }
+  .faq-title { font-size: clamp(48px, 17vw, 72px); }
+  .faq-question {
+    grid-template-columns: 34px 1fr 24px;
+    gap: 10px;
+    padding: 20px 6px;
+  }
+  .faq-number { width: 30px; height: 30px; font-size: 11px; }
+  .faq-answer { padding: 0 40px 24px 50px; }
+}
+
+@media (max-width: 430px) {
+  .site-nav a { padding: 6px 7px; }
+  .language-toggle { gap: 3px; padding: 4px; }
+  .language-toggle button { padding: 6px 7px; }
+}
