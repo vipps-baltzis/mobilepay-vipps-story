@@ -576,7 +576,7 @@
           calc(100% - 32px);
 
         padding:
-          38px
+          92px
           0
           80px;
       }
@@ -711,6 +711,35 @@
       }
 
     }
+
+
+
+    /* =========================================================
+   VIDEO SECTION
+   ========================================================= */
+
+.video-section {
+  width: 100%;
+  background: #ffffff;
+  padding:
+    clamp(48px, 7vw, 96px)
+    clamp(16px, 4vw, 48px);
+}
+
+.video-wrap {
+  width: min(50%, 600px);
+  margin: 0 auto;
+}
+
+.video-wrap video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+  border-radius: clamp(12px, 1.5vw, 22px);
+  object-fit: cover;
+  background: #ffffff;
+}
 
 
     /* =========================================================
@@ -1292,6 +1321,20 @@
 
 
   </main>
+
+
+  <section class="video-section">
+    <div class="video-wrap">
+      <video
+        src="Vipps_MobilePay_animation.mp4"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="auto"
+      ></video>
+    </div>
+  </section>
 
 
   <script>
