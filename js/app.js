@@ -31,7 +31,7 @@ const pageTitles = {
   function renderFAQ(language) {
     const root = document.getElementById('faq-root');
     if (!root || !window.FAQ_DATA) return;
-    root.innerHTML = '';
+    root.replaceChildren();
 
     let section = null;
     window.FAQ_DATA.forEach(item => {
@@ -47,7 +47,7 @@ const pageTitles = {
         title.textContent = language === 'da' ? 'Spørgsmål fra kundeservice' : language === 'fi' ? 'Asiakaspalvelun kysymykset' : 'Questions from customer support';
         root.appendChild(title);
         section = document.createElement('div');
-        section.className = 'faq-list';
+        section.className = 'faq-list faq-list--support';
         root.appendChild(section);
       }
       const q = language === 'da' ? daQ : language === 'fi' ? fiQ : enQ;
@@ -56,7 +56,20 @@ const pageTitles = {
       details.className = 'faq-item';
       const summary = document.createElement('summary');
       summary.className = 'faq-question';
-      summary.innerHTML = `<span class="faq-number">${n}</span><span>${escapeHTML(q)}</span><span class="faq-plus" aria-hidden="true"></span>`;
+
+      const number = document.createElement('span');
+      number.className = 'faq-number';
+      number.textContent = String(n);
+
+      const questionText = document.createElement('span');
+      questionText.textContent = q;
+
+      const plus = document.createElement('span');
+      plus.className = 'faq-plus';
+      plus.setAttribute('aria-hidden', 'true');
+
+      summary.append(number, questionText, plus);
+
       const answer = document.createElement('div');
       answer.className = 'faq-answer';
       a.split(/\n\n+/).forEach(paragraph => {
@@ -69,9 +82,6 @@ const pageTitles = {
     });
   }
 
-  function escapeHTML(value) {
-    return value.replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[ch]));
-  }
 
   function applyLanguage(language) {
     activeLanguage = language;

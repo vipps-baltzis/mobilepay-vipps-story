@@ -886,6 +886,11 @@
   font-weight: 700;
 }
 
+.faq-list--support .faq-number {
+  background: #E7DBFF;
+  color: #A32B04;
+}
+
 .faq-plus {
   position: relative;
   width: 22px;
