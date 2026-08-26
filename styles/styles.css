@@ -1,6 +1,6 @@
 @font-face {
       font-family: "Very Very Sans Display";
-      src: url("./fonts/VeryVerySansDisplay-Medium.woff2") format("woff2");
+      src: url("../assets/fonts/VeryVerySansDisplay-Medium.woff2") format("woff2");
       font-weight: 500;
       font-style: normal;
       font-display: swap;
@@ -8,7 +8,7 @@
 
     @font-face {
       font-family: "Very Very Sans Display";
-      src: url("./fonts/VeryVerySansDisplay-Bold.woff2") format("woff2");
+      src: url("../assets/fonts/VeryVerySansDisplay-Bold.woff2") format("woff2");
       font-weight: 700;
       font-style: normal;
       font-display: swap;
@@ -16,7 +16,7 @@
 
     @font-face {
       font-family: "Very Very Sans Text";
-      src: url("./fonts/VeryVerySans.woff2") format("woff2");
+      src: url("../assets/fonts/VeryVerySans.woff2") format("woff2");
       font-weight: 400 600;
       font-style: normal;
       font-display: swap;
@@ -24,7 +24,7 @@
 
     @font-face {
       font-family: "Very Very Sans Text";
-      src: url("./fonts/VeryVerySansText-Bold.woff2") format("woff2");
+      src: url("../assets/fonts/VeryVerySansText-Bold.woff2") format("woff2");
       font-weight: 700;
       font-style: normal;
       font-display: swap;
