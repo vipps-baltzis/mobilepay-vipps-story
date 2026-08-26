@@ -15,6 +15,19 @@
     });
   }
 
+const pageTitles = {
+  story: {
+    da: 'MobilePay skifter navn til Vipps',
+    en: 'MobilePay is changing its name to Vipps',
+    fi: 'MobilePay vaihtaa nimekseen Vipps'
+  },
+  faq: {
+    da: 'FAQ – MobilePay skifter navn til Vipps',
+    en: 'FAQ – MobilePay is changing its name to Vipps',
+    fi: 'FAQ – MobilePay vaihtaa nimekseen Vipps'
+  }
+};
+
   function renderFAQ(language) {
     const root = document.getElementById('faq-root');
     if (!root || !window.FAQ_DATA) return;
@@ -75,6 +88,14 @@
     if (heroTitle?.dataset[language]) heroTitle.textContent = heroTitle.dataset[language];
     translateStatic(language);
     renderFAQ(language);
+    
+    const currentPage =
+  document.body.dataset.page === 'faq' ||
+  document.body.classList.contains('faq-page')
+    ? 'faq'
+    : 'story';
+
+document.title = pageTitles[currentPage][language];
   }
 
   function setLanguage(language, { animate = true } = {}) {
