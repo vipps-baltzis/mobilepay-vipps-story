@@ -953,3 +953,123 @@
   .language-toggle { gap: 3px; padding: 4px; }
   .language-toggle button { padding: 6px 7px; }
 }
+
+/* =========================================================
+   CROSS-PAGE VIEW TRANSITIONS
+   ========================================================= */
+
+/*
+ * Native browser transition for index.html <-> faq.html.
+ * The floating controls are intentionally NOT given their own
+ * view-transition-name, so Chrome keeps their normal fixed layout.
+ */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: page-out 300ms cubic-bezier(.4, 0, .2, 1) both;
+}
+
+::view-transition-new(root) {
+  animation: page-in 380ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  mix-blend-mode: normal;
+}
+
+@keyframes page-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   LANGUAGE CHANGE TRANSITION
+   ========================================================= */
+
+/*
+ * app.js adds this class only while a language switch is running.
+ * That means this named transition never interferes with normal
+ * Story <-> FAQ navigation.
+ */
+.language-transition-target {
+  view-transition-name: language-content;
+}
+
+::view-transition-old(language-content) {
+  animation: language-out 180ms cubic-bezier(.4, 0, .2, 1) both;
+}
+
+::view-transition-new(language-content) {
+  animation: language-in 320ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+::view-transition-old(language-content),
+::view-transition-new(language-content) {
+  mix-blend-mode: normal;
+}
+
+@keyframes language-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+    filter: blur(1.5px);
+  }
+}
+
+@keyframes language-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(1.5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Keep the floating controls above transition snapshots. */
+.site-nav,
+.language-toggle {
+  isolation: isolate;
+}
+
+/* Respect the user's reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(language-content),
+  ::view-transition-new(language-content) {
+    animation: none !important;
+  }
+}

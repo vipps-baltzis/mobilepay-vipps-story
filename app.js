@@ -1,4 +1,3 @@
-
 (() => {
   const languageButtons = [...document.querySelectorAll('.language-button')];
   const languageVersions = [...document.querySelectorAll('[data-language-version]')];
@@ -61,7 +60,7 @@
     return value.replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[ch]));
   }
 
-  function setLanguage(language) {
+  function applyLanguage(language) {
     activeLanguage = language;
     localStorage.setItem('core-story-language', language);
     document.documentElement.lang = language;
@@ -78,7 +77,42 @@
     renderFAQ(language);
   }
 
-  languageButtons.forEach(button => button.addEventListener('click', () => setLanguage(button.dataset.language)));
+  function setLanguage(language, { animate = true } = {}) {
+    if (!['da','en','fi'].includes(language)) return;
+
+    // No need to animate when the selected language is already active.
+    if (language === activeLanguage && animate) return;
+
+    const target = document.querySelector('.content, .faq-shell');
+    const canAnimate =
+      animate &&
+      target &&
+      typeof document.startViewTransition === 'function' &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!canAnimate) {
+      applyLanguage(language);
+      requestAnimationFrame(syncFloatingTheme);
+      return;
+    }
+
+    // Give only the changing content a named transition. The nav and
+    // language picker remain ordinary fixed elements and stay rock solid.
+    target.classList.add('language-transition-target');
+
+    const transition = document.startViewTransition(() => {
+      applyLanguage(language);
+    });
+
+    transition.finished.finally(() => {
+      target.classList.remove('language-transition-target');
+      syncFloatingTheme();
+    });
+  }
+
+  languageButtons.forEach(button => button.addEventListener('click', () => {
+    setLanguage(button.dataset.language);
+  }));
 
   // Story tooltip behaviour, only on the story page.
   const tooltip = document.getElementById('tooltip');
@@ -126,22 +160,43 @@
     window.addEventListener('scroll', () => { if (activeTerm) positionTooltip(activeTerm); }, {passive:true});
   }
 
-  // Invert floating controls automatically whenever they sit over a light surface.
+  // Invert floating controls based on known page/section geometry.
+  // Avoid elementFromPoint(): View Transition snapshots can temporarily sit
+  // above the real DOM and make that kind of paint-based detection unreliable.
   function syncFloatingTheme() {
+    const isFAQ =
+      document.body.dataset.page === 'faq' ||
+      document.body.classList.contains('faq-page');
+
+    if (isFAQ) {
+      floatingControls.forEach(control => control.classList.add('on-light'));
+      return;
+    }
+
+    const lightSurfaces = [...document.querySelectorAll('[data-surface="light"]')];
+
     floatingControls.forEach(control => {
-      const r = control.getBoundingClientRect();
-      const x = Math.min(window.innerWidth - 1, Math.max(0, r.left + r.width / 2));
-      const y = Math.min(window.innerHeight - 1, Math.max(0, r.top + r.height / 2));
-      control.style.pointerEvents = 'none';
-      const under = document.elementFromPoint(x, y);
-      control.style.pointerEvents = '';
-      const surface = under?.closest?.('[data-surface]');
-      control.classList.toggle('on-light', surface?.dataset.surface === 'light');
+      const controlRect = control.getBoundingClientRect();
+      const controlY = controlRect.top + controlRect.height / 2;
+
+      const isOverLightSurface = lightSurfaces.some(surface => {
+        const surfaceRect = surface.getBoundingClientRect();
+        return controlY >= surfaceRect.top && controlY <= surfaceRect.bottom;
+      });
+
+      control.classList.toggle('on-light', isOverLightSurface);
     });
   }
+
   window.addEventListener('scroll', syncFloatingTheme, {passive:true});
   window.addEventListener('resize', syncFloatingTheme);
+  window.addEventListener('pageshow', () => {
+    requestAnimationFrame(syncFloatingTheme);
+  });
+  window.addEventListener('pagereveal', () => {
+    requestAnimationFrame(() => requestAnimationFrame(syncFloatingTheme));
+  });
 
-  setLanguage(activeLanguage);
+  setLanguage(activeLanguage, { animate: false });
   requestAnimationFrame(syncFloatingTheme);
 })();
