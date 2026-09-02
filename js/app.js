@@ -44,9 +44,9 @@ const pageTitles = {
       if (n === 36) {
         const title = document.createElement('h2');
         title.className = 'faq-section-title';
-        title.textContent = language === 'da' ? 'Spørgsmål fra kundeservice' : language === 'fi' ? 'Asiakaspalvelun kysymykset' : 'Questions from customer support';
+        title.textContent = language === 'da' ? 'Hvis du har en butik' : language === 'fi' ? 'Asiakaspalvelun kysymykset' : 'Questions from customer support';
         root.appendChild(title);
-        section = document.createElement('div');
+        section = document.createElement('div');  
         section.className = 'faq-list faq-list--support';
         root.appendChild(section);
       }
