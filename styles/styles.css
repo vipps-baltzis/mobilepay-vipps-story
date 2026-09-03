@@ -9,7 +9,7 @@
     @font-face {
       font-family: "Very Very Sans Display";
       src: url("../assets/fonts/VeryVerySansDisplay-Bold.woff2") format("woff2");
-      font-weight: 700;
+      font-weight: 600;
       font-style: normal;
       font-display: swap;
     }
@@ -25,7 +25,7 @@
     @font-face {
       font-family: "Very Very Sans Text";
       src: url("../assets/fonts/VeryVerySansText-Bold.woff2") format("woff2");
-      font-weight: 700;
+      font-weight: 600;
       font-style: normal;
       font-display: swap;
     }
@@ -233,7 +233,7 @@
 
       line-height: .94;
 
-      letter-spacing: -.055em;
+      letter-spacing: -3%;
 
       font-weight: 600;
     }
@@ -404,7 +404,7 @@
 
       letter-spacing: -.035em;
 
-      font-weight: 700;
+      font-weight: 600;
     }
 
 
@@ -510,7 +510,7 @@
       .content {
         width: min(
           calc(100% - 40px),
-          700px
+          600px
         );
 
         padding-top: 55px;
@@ -813,7 +813,7 @@
   color: var(--mobilepay-blue);
   font-family: "Very Very Sans Display", sans-serif;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   text-align: center;
   letter-spacing: .08em;
 }
@@ -824,9 +824,9 @@
   color: var(--mobilepay-blue);
   font-family: "Very Very Sans Display", sans-serif;
   font-size: clamp(52px, 8vw, 100px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: .92;
-  letter-spacing: -.055em;
+  letter-spacing: -3%;
   text-align: center;
 }
 
@@ -844,7 +844,7 @@
   color: var(--mobilepay-blue);
   font-family: "Very Very Sans Display", sans-serif;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .faq-list { border-top: 1px solid #dedede; }
@@ -882,7 +882,7 @@
   color: #7A590C;
   font-family: "Very Very Sans Text", sans-serif;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .faq-list--support .faq-number {
@@ -934,7 +934,7 @@
   border-radius: 999px;
   background: var(--mobilepay-blue);
   color: #fff;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 
