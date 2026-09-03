@@ -22,9 +22,9 @@
       fi: 'Miksi MobilePay vaihtaa nimekseen Vipps 12. tammikuuta'
     },
     faq: {
-      da: 'FAQ – MobilePay skifter navn til Vipps',
-      en: 'FAQ – MobilePay is changing its name to Vipps',
-      fi: 'FAQ – MobilePay vaihtaa nimekseen Vipps'
+      da: 'FAQ | MobilePay skifter navn til Vipps',
+      en: 'FAQ | MobilePay is changing its name to Vipps',
+      fi: 'FAQ | MobilePay vaihtaa nimekseen Vipps'
     }
   };
 
