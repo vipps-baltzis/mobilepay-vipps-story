@@ -6,9 +6,11 @@
   const tldrButton = document.querySelector('.tldr-toggle');
   const tldrView = document.querySelector('.tldr-view');
   const floatingControls = [...document.querySelectorAll('.language-toggle, .site-nav, .tldr-toggle')];
+  const themeToggle = document.querySelector('.theme-toggle');
 
   let activeLanguage = localStorage.getItem('core-story-language') || 'da';
   let tldrActive = false;
+  let invertedTheme = localStorage.getItem('core-story-inverted-theme') === 'true';
   if (!['da','en','fi'].includes(activeLanguage)) activeLanguage = 'da';
 
   function translateStatic(language) {
@@ -155,34 +157,69 @@
     );
   }
 
-  function setTldr(active, { animate = true } = {}) {
-    if (!tldrButton || !tldrView || active === tldrActive) return;
+  let stateTransitionTimeline = null;
 
-    const target = document.querySelector('.content');
+  function animateStateChange(update, { animate = true } = {}) {
+    const target = document.querySelector('.content, .faq-shell');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const canAnimate =
       animate &&
       target &&
-      typeof document.startViewTransition === 'function' &&
-      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const apply = () => {
-      tldrActive = active;
-      syncStoryMode();
-    };
+      typeof window.gsap !== 'undefined' &&
+      !reduced;
 
     if (!canAnimate) {
-      apply();
+      update();
+      requestAnimationFrame(syncFloatingTheme);
       return;
     }
 
-    target.classList.add('language-transition-target');
+    // One state animation at a time. Killing the previous timeline prevents
+    // rapid language/TLDR clicks from stacking transforms and opacity tweens.
+    if (stateTransitionTimeline) {
+      stateTransitionTimeline.kill();
+      stateTransitionTimeline = null;
+    }
+    window.gsap.killTweensOf(target);
 
-    const transition = document.startViewTransition(apply);
-
-    transition.finished.finally(() => {
-      target.classList.remove('language-transition-target');
-      syncFloatingTheme();
+    stateTransitionTimeline = window.gsap.timeline({
+      defaults: { overwrite: 'auto' },
+      onComplete: () => {
+        window.gsap.set(target, { clearProps: 'opacity,transform,willChange' });
+        stateTransitionTimeline = null;
+        syncFloatingTheme();
+      }
     });
+
+    stateTransitionTimeline
+      .set(target, { willChange: 'transform,opacity' })
+      .to(target, {
+        opacity: 0,
+        y: -5,
+        duration: 0.14,
+        ease: 'power1.in'
+      })
+      .add(() => {
+        update();
+        // Start the new content just a few pixels lower. This is intentionally
+        // subtle so the language feels like it changes in-place.
+        window.gsap.set(target, { y: 6 });
+      })
+      .to(target, {
+        opacity: 1,
+        y: 0,
+        duration: 0.24,
+        ease: 'power2.out'
+      });
+  }
+
+  function setTldr(active, { animate = true } = {}) {
+    if (!tldrButton || !tldrView || active === tldrActive) return;
+
+    animateStateChange(() => {
+      tldrActive = active;
+      syncStoryMode();
+    }, { animate });
   }
 
   tldrButton?.addEventListener('click', () => {
@@ -248,49 +285,11 @@
     { animate = true } = {}
   ) {
     if (!['da','en','fi'].includes(language)) return;
+    if (language === activeLanguage && animate) return;
 
-    if (
-      language === activeLanguage &&
-      animate
-    ) {
-      return;
-    }
-
-    const target =
-      document.querySelector(
-        '.content, .faq-shell'
-      );
-
-    const canAnimate =
-      animate &&
-      target &&
-      typeof document.startViewTransition === 'function' &&
-      !window.matchMedia(
-        '(prefers-reduced-motion: reduce)'
-      ).matches;
-
-    if (!canAnimate) {
+    animateStateChange(() => {
       applyLanguage(language);
-      requestAnimationFrame(syncFloatingTheme);
-      return;
-    }
-
-    target.classList.add(
-      'language-transition-target'
-    );
-
-    const transition =
-      document.startViewTransition(() => {
-        applyLanguage(language);
-      });
-
-    transition.finished.finally(() => {
-      target.classList.remove(
-        'language-transition-target'
-      );
-
-      syncFloatingTheme();
-    });
+    }, { animate });
   }
 
   languageButtons.forEach(button =>
@@ -300,6 +299,27 @@
       );
     })
   );
+
+  function applyInvertedTheme(active) {
+    invertedTheme = Boolean(active);
+    document.body.classList.toggle('theme-inverted', invertedTheme);
+    localStorage.setItem('core-story-inverted-theme', String(invertedTheme));
+
+    if (themeToggle) {
+      themeToggle.setAttribute('aria-pressed', String(invertedTheme));
+      themeToggle.setAttribute(
+        'aria-label',
+        invertedTheme ? 'Use original colours' : 'Invert colours'
+      );
+      themeToggle.title = invertedTheme ? 'Use original colours' : 'Invert colours';
+    }
+
+    requestAnimationFrame(syncFloatingTheme);
+  }
+
+  themeToggle?.addEventListener('click', () => {
+    applyInvertedTheme(!invertedTheme);
+  });
 
   const tooltip =
     document.getElementById('tooltip');
@@ -529,14 +549,10 @@
         'faq-page'
       );
 
-    if (isFAQ) {
+    if (isFAQ || document.body.classList.contains('theme-inverted')) {
       floatingControls.forEach(
-        control =>
-          control.classList.add(
-            'on-light'
-          )
+        control => control.classList.add('on-light')
       );
-
       return;
     }
 
@@ -611,6 +627,180 @@
     }
   );
 
+
+  /* =======================================================
+     GSAP MOTION
+     ======================================================= */
+
+  const prefersReducedMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches;
+
+  const hasGSAP = typeof window.gsap !== 'undefined';
+
+  function animatePageEntrance() {
+    const internalNavigation = sessionStorage.getItem('core-story-internal-nav') === '1';
+    if (internalNavigation) {
+      sessionStorage.removeItem('core-story-internal-nav');
+      return;
+    }
+
+    if (!hasGSAP || prefersReducedMotion) return;
+
+    const shell = document.querySelector('.content, .faq-shell');
+    if (!shell) return;
+
+    window.gsap.fromTo(
+      shell,
+      { opacity: 0.92, y: 3 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.2,
+        ease: 'power2.out',
+        clearProps: 'opacity,transform'
+      }
+    );
+  }
+
+  function setupScrollTextReveals() {
+    if (!hasGSAP || prefersReducedMotion || !('IntersectionObserver' in window)) {
+      return;
+    }
+
+    const targets = [
+      ...document.querySelectorAll(
+        '.story:not([hidden]) p, .story:not([hidden]) .brand-change, .faq-item, .faq-section-title, .faq-footer'
+      )
+    ];
+
+    if (!targets.length) return;
+
+    targets.forEach(el => {
+      if (el.dataset.gsapRevealReady === 'true') return;
+      el.dataset.gsapRevealReady = 'true';
+      window.gsap.set(el, { opacity: 0, y: 18 });
+    });
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+
+          window.gsap.to(entry.target, {
+            opacity: 1,
+            y: 0,
+            duration: 0.52,
+            ease: 'power2.out',
+            overwrite: true,
+            onComplete: () => {
+              window.gsap.set(entry.target, { clearProps: 'opacity,transform,willChange' });
+            }
+          });
+
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -6% 0px' }
+    );
+
+    targets.forEach(el => observer.observe(el));
+  }
+
+  function setupGSAPHovers() {
+    if (!hasGSAP || prefersReducedMotion) return;
+
+    // Keep GSAP hover motion away from the TLDR control: that button uses a
+    // CSS translateX(-50%) for centering, and competing transform writers can
+    // create a visible jump. Its existing CSS hover treatment is enough.
+    const hoverTargets = document.querySelectorAll(
+      '.site-nav a, .language-button, .faq-back'
+    );
+
+    hoverTargets.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        window.gsap.to(el, {
+          scale: 1.035,
+          duration: 0.16,
+          ease: 'power2.out',
+          overwrite: true
+        });
+      });
+
+      el.addEventListener('mouseleave', () => {
+        window.gsap.to(el, {
+          scale: 1,
+          duration: 0.18,
+          ease: 'power2.out',
+          overwrite: true,
+          onComplete: () => window.gsap.set(el, { clearProps: 'transform' })
+        });
+      });
+    });
+
+    document.addEventListener('mouseover', event => {
+      const question = event.target.closest('.faq-question');
+      if (!question || question.contains(event.relatedTarget)) return;
+      window.gsap.to(question, {
+        x: 4,
+        duration: 0.16,
+        ease: 'power2.out',
+        overwrite: true
+      });
+    });
+
+    document.addEventListener('mouseout', event => {
+      const question = event.target.closest('.faq-question');
+      if (!question || question.contains(event.relatedTarget)) return;
+      window.gsap.to(question, {
+        x: 0,
+        duration: 0.18,
+        ease: 'power2.out',
+        overwrite: true,
+        onComplete: () => window.gsap.set(question, { clearProps: 'transform' })
+      });
+    });
+  }
+
+  function setupPageTransitions() {
+    // Cross-document animation is handled by the browser View Transition API.
+    // We intentionally do NOT fade/transform the outgoing DOM here; doing so
+    // was the source of the visible blink on real document navigation.
+    document.addEventListener('click', event => {
+      const link = event.target.closest('a[href]');
+      if (!link) return;
+
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        link.target === '_blank' ||
+        link.hasAttribute('download')
+      ) {
+        return;
+      }
+
+      const destination = new URL(link.href, window.location.href);
+      if (destination.origin !== window.location.origin) return;
+
+      const current = new URL(window.location.href);
+      if (
+        destination.pathname === current.pathname &&
+        destination.search === current.search &&
+        destination.hash === current.hash
+      ) {
+        return;
+      }
+
+      sessionStorage.setItem('core-story-internal-nav', '1');
+    });
+  }
+
+
+
   setLanguage(
     activeLanguage,
     {
@@ -618,7 +808,16 @@
     }
   );
 
-  requestAnimationFrame(
-    syncFloatingTheme
-  );
+  if (themeToggle) {
+    applyInvertedTheme(invertedTheme);
+  }
+
+  animatePageEntrance();
+  setupGSAPHovers();
+  setupPageTransitions();
+
+  requestAnimationFrame(() => {
+    setupScrollTextReveals();
+    syncFloatingTheme();
+  });
 })();
