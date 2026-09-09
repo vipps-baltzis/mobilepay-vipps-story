@@ -3,9 +3,12 @@
   const languageVersions = [...document.querySelectorAll('[data-language-version]')];
   const brandChangeText = document.querySelector('.brand-change-text');
   const heroTitle = document.querySelector('.hero-title');
-  const floatingControls = [...document.querySelectorAll('.language-toggle, .site-nav')];
+  const tldrButton = document.querySelector('.tldr-toggle');
+  const tldrView = document.querySelector('.tldr-view');
+  const floatingControls = [...document.querySelectorAll('.language-toggle, .site-nav, .tldr-toggle')];
 
   let activeLanguage = localStorage.getItem('core-story-language') || 'da';
+  let tldrActive = false;
   if (!['da','en','fi'].includes(activeLanguage)) activeLanguage = 'da';
 
   function translateStatic(language) {
@@ -14,6 +17,27 @@
       if (value != null) el.textContent = value;
     });
   }
+
+  const tldrLabels = {
+    da: {
+      short: 'Giv mig den korte version',
+      full: 'Hele historien',
+      shortLabel: 'Giv mig den korte version',
+      fullLabel: 'Vis hele historien'
+    },
+    en: {
+      short: 'Give me the short version',
+      full: 'Full story',
+      shortLabel: 'Give me the short version',
+      fullLabel: 'Show the full story'
+    },
+    fi: {
+      short: 'Näytä lyhyt versio',
+      full: 'Koko tarina',
+      shortLabel: 'Näytä lyhyt versio',
+      fullLabel: 'Näytä koko tarina'
+    }
+  };
 
   const pageTitles = {
     story: {
@@ -108,6 +132,63 @@
     });
   }
 
+  function syncStoryMode() {
+    if (!tldrButton || !tldrView) return;
+
+    heroTitle.hidden = tldrActive;
+    tldrView.hidden = !tldrActive;
+
+    languageVersions.forEach(version => {
+      version.hidden =
+        tldrActive ||
+        version.dataset.languageVersion !== activeLanguage;
+    });
+
+    const labels = tldrLabels[activeLanguage] || tldrLabels.en;
+
+    tldrButton.textContent = tldrActive ? labels.full : labels.short;
+    tldrButton.classList.toggle('is-active', tldrActive);
+    tldrButton.setAttribute('aria-pressed', String(tldrActive));
+    tldrButton.setAttribute(
+      'aria-label',
+      tldrActive ? labels.fullLabel : labels.shortLabel
+    );
+  }
+
+  function setTldr(active, { animate = true } = {}) {
+    if (!tldrButton || !tldrView || active === tldrActive) return;
+
+    const target = document.querySelector('.content');
+    const canAnimate =
+      animate &&
+      target &&
+      typeof document.startViewTransition === 'function' &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const apply = () => {
+      tldrActive = active;
+      syncStoryMode();
+    };
+
+    if (!canAnimate) {
+      apply();
+      return;
+    }
+
+    target.classList.add('language-transition-target');
+
+    const transition = document.startViewTransition(apply);
+
+    transition.finished.finally(() => {
+      target.classList.remove('language-transition-target');
+      syncFloatingTheme();
+    });
+  }
+
+  tldrButton?.addEventListener('click', () => {
+    setTldr(!tldrActive);
+  });
+
   function applyLanguage(language) {
     activeLanguage = language;
 
@@ -150,6 +231,7 @@
 
     translateStatic(language);
     renderFAQ(language);
+    syncStoryMode();
 
     const currentPage =
       document.body.dataset.page === 'faq' ||
