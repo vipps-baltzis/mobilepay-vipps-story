@@ -22,40 +22,44 @@
       <a href="faq/" data-nav-faq>FAQ</a>
     </nav>
 
-
     <div class="language-toggle" aria-label="Vælg sprog">
       <button type="button" class="language-button is-active" data-language="da" aria-pressed="true">DA</button>
       <button type="button" class="language-button" data-language="en" aria-pressed="false">EN</button>
       <button type="button" class="language-button" data-language="fi" aria-pressed="false">FI</button>
     </div>
 
+    <button
+      type="button"
+      class="tldr-toggle"
+      aria-pressed="false"
+      aria-label="Giv mig den korte version"
+    >
+      Giv mig den korte version
+    </button>
+
 
     <div class="content">
 
-      <div class="brand-change">
 
-        <img
-          src="assets/images/MP_Logo_Vertical-digital_White_RGB.svg"
-          alt="MobilePay"
-          class="mobilepay-logo"
+      <section class="tldr-view" hidden aria-live="polite">
+        <h1
+          class="tldr-title"
+          data-da="MobilePay skifter navn til Vipps"
+          data-en="MobilePay is changing its name to Vipps"
+          data-fi="MobilePay vaihtaa nimekseen Vipps"
         >
+          MobilePay skifter navn til Vipps
+        </h1>
 
-        <span
-          class="brand-change-text"
-          data-da="skifter navn til"
-          data-en="is changing its name to"
-          data-fi="vaihtaa nimekseen"
+        <p
+          class="tldr-copy"
+          data-da="Nyt logo, samme app, stadig nordisk."
+          data-en="New logo, same app, still Nordic."
+          data-fi="Uusi logo, sama sovellus, yhä pohjoismainen."
         >
-          skifter navn til
-        </span>
-
-        <img
-          src="assets/images/vipps.png"
-          alt="Vipps"
-          class="vipps-logo"
-        >
-
-      </div>
+          Nyt logo, samme app, stadig nordisk.
+        </p>
+      </section>
 
 
       <h1
@@ -178,6 +182,31 @@
           Vi ved godt, det tager lidt tid at vænne sig til det. Det er derfor,
           det først sker den 12. januar.
         </p>
+
+        <div class="brand-change">
+
+        <img
+          src="assets/images/MP_Logo_Vertical-digital_White_RGB.svg"
+          alt="MobilePay"
+          class="mobilepay-logo"
+        >
+
+        <span
+          class="brand-change-text"
+          data-da="skifter navn til"
+          data-en="is changing its name to"
+          data-fi="vaihtaa nimekseen"
+        >
+          skifter navn til
+        </span>
+
+        <img
+          src="assets/images/vipps.png"
+          alt="Vipps"
+          class="vipps-logo"
+        >
+
+      </div>
 
       </div>
 

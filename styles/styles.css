@@ -38,10 +38,10 @@
   --mobilepay-blue: #5873f8;
   --mobilepay-blue-dark: #4d67ec;
 
-  --mobilepay-yellow: #D0FA7D;
+  --mobilepay-yellow: #C2CEFF;
 
   --white: #ffffff;
-  --black: #7A590C;
+  --black: #001580;
 
   --content-width: 580px;
 }
@@ -292,13 +292,10 @@
       display: inline;
 
       margin: 0;
-      padding: 0;
+      padding: 0 .08em;
 
       border: 0;
-
-      border-bottom:
-        1px dashed
-        rgba(255,255,255,.9);
+      border-radius: .18em;
 
       background: transparent;
 
@@ -310,20 +307,31 @@
 
       cursor: help;
 
+      box-shadow:
+        inset 0 -.22em 0 rgba(194,206,255,.34);
+
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+
       transition:
-        opacity .18s ease,
-        border-color .18s ease;
+        box-shadow .24s cubic-bezier(.22, 1, .36, 1),
+        color .18s ease;
     }
 
 
-    .term:hover,
+    .term:hover {
+      color: #001580;
+      box-shadow:
+        inset 0 -1.35em 0 #C2CEFF;
+    }
+
+
     .term:focus-visible {
-      opacity: .7;
-
-      border-bottom-color:
-        rgba(255,255,255,1);
-
-      outline: none;
+      color: #001580;
+      box-shadow:
+        inset 0 -1.35em 0 #C2CEFF;
+      outline: 2px solid rgba(194,206,255,.9);
+      outline-offset: 2px;
     }
 
 
@@ -451,6 +459,189 @@
 
 
     /* =========================================================
+   TLDR TOGGLE + VIEW
+   ========================================================= */
+
+.tldr-toggle {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  z-index: 100;
+
+  transform: translateX(-50%);
+
+  padding: 11px 18px;
+
+  border: 0;
+  border-radius: 999px;
+
+  /* Inactive state: Blue 200 + Blue 800 */
+  background: #C2CEFF;
+  color: #001580;
+
+  font-family: "Very Very Sans Text", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 5px 18px rgba(0,21,128,.14);
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    box-shadow .2s ease;
+}
+
+
+/* ---------------------------------------------------------
+   INACTIVE → HOVER
+
+   Preview active state:
+   Blue 800 + Blue 100
+   --------------------------------------------------------- */
+
+.tldr-toggle:hover {
+  background: #001580;
+  color: #E5EAFF;
+
+  box-shadow:
+    0 5px 18px rgba(0,21,128,.20);
+}
+
+
+/* ---------------------------------------------------------
+   ACTIVE
+
+   Blue 800 + Blue 100
+   --------------------------------------------------------- */
+
+.tldr-toggle.is-active {
+  background: #001580;
+  color: #E5EAFF;
+
+  box-shadow:
+    0 5px 18px rgba(0,21,128,.20);
+}
+
+
+/* ---------------------------------------------------------
+   ACTIVE → HOVER
+
+   Preview inactive state:
+   Blue 200 + Blue 800
+   --------------------------------------------------------- */
+
+.tldr-toggle.is-active:hover {
+  background: #C2CEFF;
+  color: #001580;
+
+  box-shadow:
+    0 5px 18px rgba(0,21,128,.14);
+}
+
+
+/* No movement when clicking */
+
+.tldr-toggle:active {
+  transform: translateX(-50%);
+}
+
+
+/* ---------------------------------------------------------
+   LIGHT SURFACES
+
+   TLDR deliberately keeps its own solid colour system
+   instead of adopting the glass navigation treatment.
+   --------------------------------------------------------- */
+
+.tldr-toggle.on-light {
+  background: #C2CEFF;
+  color: #001580;
+
+  box-shadow:
+    0 5px 18px rgba(0,21,128,.14);
+}
+
+
+/* Inactive + hover on light */
+
+.tldr-toggle.on-light:hover {
+  background: #001580;
+  color: #E5EAFF;
+
+  box-shadow:
+    0 5px 18px rgba(0,21,128,.20);
+}
+
+
+/* Active on light */
+
+.tldr-toggle.on-light.is-active {
+  background: #001580;
+  color: #E5EAFF;
+
+  box-shadow:
+    0 5px 18px rgba(0,21,128,.20);
+}
+
+
+/* Active + hover on light */
+
+.tldr-toggle.on-light.is-active:hover {
+  background: #C2CEFF;
+  color: #001580;
+
+  box-shadow:
+    0 5px 18px rgba(0,21,128,.14);
+}
+
+
+/* =========================================================
+   TLDR CONTENT
+   ========================================================= */
+
+.tldr-view {
+  width: min(100%, var(--content-width));
+  min-height: clamp(420px, 60vh, 640px);
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+
+.tldr-view[hidden] {
+  display: none;
+}
+
+
+.tldr-title {
+  margin: 0 0 clamp(26px, 3vw, 42px);
+
+  font-family: "Very Very Sans Display", sans-serif;
+  font-size: clamp(50px, 7vw, 92px);
+  font-weight: 600;
+  line-height: .94;
+  letter-spacing: -3%;
+}
+
+
+.tldr-copy {
+  margin: 0;
+
+  font-family: "Very Very Sans Text", sans-serif;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+
+    /* =========================================================
        LANGUAGE TOGGLE
        ========================================================= */
 
@@ -546,6 +737,24 @@
        ========================================================= */
 
     @media (max-width: 600px) {
+
+      .tldr-toggle {
+        top: 12px;
+        padding: 10px 12px;
+        font-size: 11px;
+      }
+
+      .tldr-view {
+        min-height: 58vh;
+      }
+
+      .tldr-title {
+        font-size: clamp(42px, 12vw, 58px);
+      }
+
+      .tldr-copy {
+        font-size: clamp(18px, 5vw, 22px);
+      }
 
       .language-toggle {
         top: 12px;
@@ -878,16 +1087,16 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #D0FA7D;
-  color: #7A590C;
+  background: #C2CEFF;
+  color: #001580;
   font-family: "Very Very Sans Text", sans-serif;
   font-size: 12px;
   font-weight: 600;
 }
 
 .faq-list--support .faq-number {
-  background: #E7DBFF;
-  color: #A32B04;
+  background: #001580;
+  color: #E5EAFF;
 }
 
 .faq-plus {
@@ -1064,7 +1273,8 @@
 
 /* Keep the floating controls above transition snapshots. */
 .site-nav,
-.language-toggle {
+.language-toggle,
+.tldr-toggle {
   isolation: isolate;
 }
 
