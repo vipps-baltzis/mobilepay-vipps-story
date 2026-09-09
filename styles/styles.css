@@ -218,10 +218,7 @@
         "Very Very Sans Display",
         sans-serif;
 
-      margin:
-        0
-        0
-        clamp(35px, 4vw, 55px);
+      margin: 0;
 
       text-align: center;
 
@@ -233,7 +230,7 @@
 
       line-height: .94;
 
-      letter-spacing: -3%;
+      letter-spacing: -1%;
 
       font-weight: 600;
     }
@@ -463,12 +460,12 @@
    ========================================================= */
 
 .tldr-toggle {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  z-index: 100;
+  display: block;
+  width: fit-content;
 
-  transform: translateX(-50%);
+  margin:
+    clamp(30px, 4vw, 48px)
+    auto;
 
   padding: 11px 18px;
 
@@ -541,19 +538,7 @@
 }
 
 
-/* No movement when clicking */
-
-.tldr-toggle:active {
-  transform: translateX(-50%);
-}
-
-
-/* ---------------------------------------------------------
-   LIGHT SURFACES
-
-   TLDR deliberately keeps its own solid colour system
-   instead of adopting the glass navigation treatment.
-   --------------------------------------------------------- */
+/* TLDR keeps the same solid colour system on light surfaces. */
 
 .tldr-toggle.on-light {
   background: #C2CEFF;
@@ -563,37 +548,19 @@
     0 5px 18px rgba(0,21,128,.14);
 }
 
-
-/* Inactive + hover on light */
-
 .tldr-toggle.on-light:hover {
   background: #001580;
   color: #E5EAFF;
-
-  box-shadow:
-    0 5px 18px rgba(0,21,128,.20);
 }
-
-
-/* Active on light */
 
 .tldr-toggle.on-light.is-active {
   background: #001580;
   color: #E5EAFF;
-
-  box-shadow:
-    0 5px 18px rgba(0,21,128,.20);
 }
-
-
-/* Active + hover on light */
 
 .tldr-toggle.on-light.is-active:hover {
   background: #C2CEFF;
   color: #001580;
-
-  box-shadow:
-    0 5px 18px rgba(0,21,128,.14);
 }
 
 
@@ -614,6 +581,14 @@
   text-align: center;
 }
 
+/* In the short version the button belongs below the heading + copy. */
+.tldr-view .tldr-toggle {
+  margin:
+    clamp(28px, 3.5vw, 42px)
+    auto
+    0;
+}
+
 
 .tldr-view[hidden] {
   display: none;
@@ -627,7 +602,7 @@
   font-size: clamp(50px, 7vw, 92px);
   font-weight: 600;
   line-height: .94;
-  letter-spacing: -3%;
+  letter-spacing: -1%;
 }
 
 
@@ -714,7 +689,7 @@
 
 
       .hero-title {
-        margin-bottom: 40px;
+        margin-bottom: 0;
       }
 
 
@@ -739,9 +714,11 @@
     @media (max-width: 600px) {
 
       .tldr-toggle {
-        top: 12px;
         padding: 10px 12px;
         font-size: 11px;
+        margin:
+          28px
+          auto;
       }
 
       .tldr-view {
@@ -806,7 +783,7 @@
 
 
       .hero-title {
-        margin-bottom: 34px;
+        margin-bottom: 0;
 
         font-size:
           clamp(
@@ -1035,7 +1012,7 @@
   font-size: clamp(52px, 8vw, 100px);
   font-weight: 600;
   line-height: .92;
-  letter-spacing: -3%;
+  letter-spacing: -1%;
   text-align: center;
 }
 

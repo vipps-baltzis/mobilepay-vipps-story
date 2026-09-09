@@ -135,8 +135,22 @@
   function syncStoryMode() {
     if (!tldrButton || !tldrView) return;
 
-    heroTitle.hidden = tldrActive;
-    tldrView.hidden = !tldrActive;
+    /*
+     * The same button lives in two logical places:
+     * - full story: directly below the Why? heading
+     * - short version: directly below the short copy
+     *
+     * Moving the existing element keeps all state/listeners intact.
+     */
+    if (tldrActive) {
+      heroTitle.hidden = true;
+      tldrView.hidden = false;
+      tldrView.appendChild(tldrButton);
+    } else {
+      heroTitle.hidden = false;
+      heroTitle.insertAdjacentElement('afterend', tldrButton);
+      tldrView.hidden = true;
+    }
 
     languageVersions.forEach(version => {
       version.hidden =
