@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; img-src 'self'; font-src 'self'; media-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'">
   <meta name="referrer" content="no-referrer">
   <meta
     name="viewport"
@@ -15,33 +15,45 @@
 
 <body>
 
+  <a class="skip-link" href="#main-content" data-da="Spring til hovedindhold" data-en="Skip to main content" data-fi="Siirry pääsisältöön">Spring til hovedindhold</a>
+
   <main class="page" data-surface="dark">
 
-    <nav class="site-nav" aria-label="Primary navigation">
-      <a href="./" class="is-active" data-nav-story data-da="Historie" data-en="Story" data-fi="Tarina">Historie</a>
+    <nav class="site-nav" aria-label="Primær navigation" data-aria-da="Primær navigation" data-aria-en="Primary navigation" data-aria-fi="Päänavigointi">
+      <a href="./" class="is-active" aria-current="page" data-nav-story data-da="Historie" data-en="Story" data-fi="Tarina">Historie</a>
       <a href="faq/" data-nav-faq>FAQ</a>
     </nav>
 
-    <div class="language-toggle" aria-label="Vælg sprog">
-      <button type="button" class="language-button is-active" data-language="da" aria-pressed="true">DA</button>
-      <button type="button" class="language-button" data-language="en" aria-pressed="false">EN</button>
-      <button type="button" class="language-button" data-language="fi" aria-pressed="false">FI</button>
+    <div class="language-toggle" role="group" aria-label="Vælg sprog" data-aria-da="Vælg sprog" data-aria-en="Choose language" data-aria-fi="Valitse kieli">
+      <button type="button" class="language-button is-active" data-language="da" lang="da" aria-label="Dansk" aria-pressed="true">DA</button>
+      <button type="button" class="language-button" data-language="en" lang="en" aria-label="English" aria-pressed="false">EN</button>
+      <button type="button" class="language-button" data-language="fi" lang="fi" aria-label="Suomi" aria-pressed="false">FI</button>
     </div>
+
+    <button
+      type="button"
+      class="theme-toggle"
+      aria-pressed="false"
+      aria-label="Inverter farver"
+      title="Inverter farver"
+    ><span aria-hidden="true">◐</span></button>
 
     <button
       type="button"
       class="tldr-toggle"
       aria-pressed="false"
       aria-label="Giv mig den korte version"
+      aria-controls="tldr-content"
+      aria-expanded="false"
     >
       Giv mig den korte version
     </button>
 
 
-    <div class="content">
+    <div class="content" id="main-content" tabindex="-1">
 
 
-      <section class="tldr-view" hidden aria-live="polite">
+      <section class="tldr-view" id="tldr-content" hidden aria-live="polite">
         <h1
           class="tldr-title"
           data-da="MobilePay skifter navn til Vipps"
@@ -182,31 +194,6 @@
           Vi ved godt, det tager lidt tid at vænne sig til det. Det er derfor,
           det først sker den 12. januar.
         </p>
-
-        <div class="brand-change">
-
-        <img
-          src="assets/images/MP_Logo_Vertical-digital_White_RGB.svg"
-          alt="MobilePay"
-          class="mobilepay-logo"
-        >
-
-        <span
-          class="brand-change-text"
-          data-da="skifter navn til"
-          data-en="is changing its name to"
-          data-fi="vaihtaa nimekseen"
-        >
-          skifter navn til
-        </span>
-
-        <img
-          src="assets/images/vipps.png"
-          alt="Vipps"
-          class="vipps-logo"
-        >
-
-      </div>
 
       </div>
 
@@ -448,23 +435,54 @@
       </div>
 
 
+      <!-- Shared brand-change lockup: visible in every language. -->
+      <div class="brand-change" role="img" aria-label="MobilePay skifter navn til Vipps" data-aria-da="MobilePay skifter navn til Vipps" data-aria-en="MobilePay is changing its name to Vipps" data-aria-fi="MobilePay vaihtaa nimekseen Vipps">
+        <img
+          src="assets/images/MP_Logo_Vertical-digital_White_RGB.svg"
+          alt=""
+          aria-hidden="true"
+          class="brand-change-logo mobilepay-logo"
+        >
+
+        <span
+          class="brand-change-text"
+          data-da="skifter navn til"
+          data-en="is changing its name to"
+          data-fi="vaihtaa nimekseen"
+        >
+          skifter navn til
+        </span>
+
+        <img
+          src="assets/images/Vipps_Logo_Vertical-digital_Blue_RGB.svg"
+          alt=""
+          aria-hidden="true"
+          class="brand-change-logo vipps-logo"
+        >
+      </div>
+
+
     <aside
       class="tooltip-card"
       id="tooltip"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="tooltip-title"
+      aria-describedby="tooltip-text"
       aria-hidden="true"
     >
 
       <button
         class="tooltip-close"
         type="button"
-        aria-label="Close explanation"
+        aria-label="Luk forklaring" data-aria-da="Luk forklaring" data-aria-en="Close explanation" data-aria-fi="Sulje selitys"
       >
         ×
       </button>
 
-      <h2></h2>
+      <h2 id="tooltip-title"></h2>
 
-      <p></p>
+      <p id="tooltip-text"></p>
 
     </aside>
 
@@ -476,6 +494,8 @@
     <div class="video-wrap">
       <video
         src="assets/video/Vipps_MobilePay_animation.mp4"
+        data-decorative-video
+        aria-hidden="true"
         autoplay
         loop
         muted
@@ -486,6 +506,9 @@
   </section>
 
 
+  <p class="sr-only" id="a11y-status" role="status" aria-live="polite" aria-atomic="true"></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
   <script src="js/app.js"></script>
 
 </body>

@@ -42,8 +42,15 @@
 
   --white: #ffffff;
   --black: #001580;
+  --ink: #312e2c;
 
   --content-width: 580px;
+
+  /* One shared vertical rhythm for story sections. */
+  --story-section-gap: clamp(38px, 5vw, 62px);
+
+  /* Shared spacing between the short-version title, copy and brand lockup. */
+  --tldr-content-gap: clamp(26px, 3vw, 42px);
 }
 
 
@@ -130,7 +137,7 @@
       padding:
         clamp(60px, 8vw, 110px)
         0
-        clamp(90px, 10vw, 150px);
+        var(--story-section-gap);
     }
 
 
@@ -146,8 +153,11 @@
 
       gap: clamp(10px, 1vw, 20px);
 
-      margin-bottom:
-        clamp(45px, 6vw, 80px);
+      /* Treat the lockup like another story section: the gap above it
+         and the gap from it to the video are driven by the same token
+         as the paragraph spacing. */
+      margin-top: var(--story-section-gap);
+      margin-bottom: 0;
     }
 
 
@@ -273,7 +283,7 @@
       margin:
         0
         0
-        clamp(38px, 5vw, 62px);
+        var(--story-section-gap);
     }
 
 
@@ -292,12 +302,17 @@
       display: inline;
 
       margin: 0;
-      padding: 0 .08em;
+      padding: .02em .16em .04em;
 
       border: 0;
-      border-radius: .18em;
+      border-radius: .2em;
 
-      background: transparent;
+      background:
+        linear-gradient(
+          to top,
+          rgba(194,206,255,.34) 0 .28em,
+          transparent .28em
+        );
 
       color: inherit;
 
@@ -305,33 +320,31 @@
       font-size: inherit;
       line-height: inherit;
 
-      cursor: help;
+      cursor: pointer;
 
-      box-shadow:
-        inset 0 -.22em 0 rgba(194,206,255,.34);
+      text-decoration: none;
 
       -webkit-box-decoration-break: clone;
       box-decoration-break: clone;
 
       transition:
-        box-shadow .24s cubic-bezier(.22, 1, .36, 1),
-        color .18s ease;
+        background .2s cubic-bezier(.22, 1, .36, 1),
+        color .18s ease,
+        text-decoration-color .18s ease;
     }
 
 
     .term:hover {
       color: #001580;
-      box-shadow:
-        inset 0 -1.35em 0 #C2CEFF;
+      background: #C2CEFF;
     }
 
 
     .term:focus-visible {
       color: #001580;
-      box-shadow:
-        inset 0 -1.35em 0 #C2CEFF;
-      outline: 2px solid rgba(194,206,255,.9);
-      outline-offset: 2px;
+      background: #C2CEFF;
+      outline: 2px solid rgba(194,206,255,.95);
+      outline-offset: 3px;
     }
 
 
@@ -438,8 +451,8 @@
     .tooltip-close {
       position: absolute;
 
-      top: 9px;
-      right: 12px;
+      top: 14px;
+      right: 20px;
 
       padding: 0;
 
@@ -621,7 +634,7 @@
 
 
 .tldr-title {
-  margin: 0 0 clamp(26px, 3vw, 42px);
+  margin: 0 0 var(--tldr-content-gap);
 
   font-family: "Very Very Sans Display", sans-serif;
   font-size: clamp(50px, 7vw, 92px);
@@ -638,6 +651,27 @@
   font-size: clamp(20px, 2vw, 28px);
   font-weight: 400;
   line-height: 1.3;
+}
+
+
+/* When the short version is active, center the short story as one group.
+   The title-to-copy and copy-to-lockup gaps use the exact same token. */
+.page.is-tldr-active .content {
+  min-height: 100vh;
+  padding-top: clamp(90px, 12vh, 130px);
+  padding-bottom: clamp(90px, 12vh, 130px);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.page.is-tldr-active .tldr-view {
+  min-height: 0;
+}
+
+.page.is-tldr-active .brand-change {
+  margin-top: var(--tldr-content-gap);
 }
 
 
@@ -708,9 +742,6 @@
       }
 
 
-      .brand-change {
-        margin-bottom: 50px;
-      }
 
 
       .hero-title {
@@ -773,14 +804,12 @@
         padding:
           92px
           0
-          80px;
+          var(--story-section-gap);
       }
 
 
       .brand-change {
         gap: 10px;
-
-        margin-bottom: 42px;
       }
 
 
@@ -1008,7 +1037,7 @@
 .faq-page {
   min-height: 100vh;
   background: #fff;
-  color: #171717;
+  color: var(--ink);
 }
 
 .faq-shell {
@@ -1042,7 +1071,7 @@
 .faq-intro {
   max-width: 620px;
   margin: 0 auto clamp(56px, 8vw, 90px);
-  color: #5d5d5d;
+  color: var(--ink);
   font-size: clamp(17px, 1.8vw, 21px);
   line-height: 1.4;
   text-align: center;
@@ -1073,7 +1102,7 @@
   align-items: center;
   padding: 24px 12px;
   cursor: pointer;
-  color: #1a1a1a;
+  color: var(--ink);
   font-family: "Very Very Sans Display", sans-serif;
   font-size: clamp(18px, 2.1vw, 24px);
   font-weight: 500;
@@ -1123,7 +1152,7 @@
 
 .faq-answer {
   padding: 0 58px 28px 68px;
-  color: #4c4c4c;
+  color: var(--ink);
   font-family: "Very Very Sans Text", sans-serif;
   font-size: clamp(16px, 1.5vw, 19px);
   line-height: 1.52;
@@ -1168,122 +1197,341 @@
 }
 
 /* =========================================================
-   CROSS-PAGE VIEW TRANSITIONS
+   MOTION SUPPORT
    ========================================================= */
 
-/*
- * Native browser transition for index.html <-> faq.html.
- * The floating controls are intentionally NOT given their own
- * view-transition-name, so Chrome keeps their normal fixed layout.
- */
+/* Rounded data-explainer cards */
+.tooltip-card {
+  border-radius: clamp(20px, 2vw, 28px);
+  overflow: hidden;
+}
+
+/* GSAP hover targets use transforms only when they are not layout-critical. */
+.site-nav a,
+.language-button,
+.faq-back,
+.faq-question,
+.term {
+  transform-origin: center;
+}
+
+/* The TLDR control is positioned with translateX(-50%), so GSAP deliberately
+   does not write transforms to it. */
+.tldr-toggle {
+  transform-origin: center;
+}
+
+
+/* =========================================================
+   REFINED INTERACTION + INVERTED STORY THEME
+   ========================================================= */
+
+/* Interactive terms: quiet marker highlight only. No dotted underline/icon. */
+.term {
+  padding: .02em .12em .04em;
+  border-radius: .16em;
+  background: linear-gradient(
+    to top,
+    rgba(194,206,255,.38) 0 .26em,
+    transparent .26em
+  );
+  text-decoration: none;
+}
+
+.term:hover,
+.term:focus-visible {
+  color: #001580;
+  background: #C2CEFF;
+}
+
+/* One-time discovery cue for explainer terms. The marker grows and settles
+   back without moving text or changing layout. */
+.term.term-attention {
+  animation: term-attention-pulse 1600ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes term-attention-pulse {
+  0%, 100% {
+    box-shadow: inset 0 -.22em 0 rgba(194,206,255,.34);
+  }
+
+  45% {
+    box-shadow: inset 0 -.58em 0 rgba(194,206,255,.88);
+  }
+}
+
+/* Cross-document transitions: keep the old page fully opaque while the new
+   page settles over it. This avoids exposing a bright intermediate canvas. */
 @view-transition {
   navigation: auto;
 }
 
 ::view-transition-old(root) {
-  animation: page-out 300ms cubic-bezier(.4, 0, .2, 1) both;
+  animation: none;
 }
 
 ::view-transition-new(root) {
-  animation: page-in 380ms cubic-bezier(.22, 1, .36, 1) both;
+  animation: core-story-page-in 180ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  mix-blend-mode: normal;
+@keyframes core-story-page-in {
+  from { transform: translateY(5px); opacity: .985; }
+  to   { transform: translateY(0); opacity: 1; }
 }
 
-@keyframes page-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
+/* Tiny comparison control for the story-page inversion experiment. */
+.theme-toggle {
+  position: fixed;
+  top: auto;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 5px 18px rgba(0,21,128,.08);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(255,255,255,.2);
+}
+
+/* Story inversion: blue -> white, display type -> blue, body copy -> black. */
+body.theme-inverted {
+  background: #fff;
+  color: var(--mobilepay-blue);
+}
+
+body.theme-inverted .page {
+  background: #fff;
+}
+
+body.theme-inverted .hero-title,
+body.theme-inverted .tldr-title,
+body.theme-inverted .brand-change-text {
+  color: var(--mobilepay-blue);
+}
+
+body.theme-inverted .story,
+body.theme-inverted .story p,
+body.theme-inverted .tldr-copy {
+  color: var(--ink);
+}
+
+/* The source MobilePay logo is white; tint it blue in the inverted test. */
+body.theme-inverted .mobilepay-logo {
+  filter: brightness(0) saturate(100%) invert(46%) sepia(73%) saturate(2865%) hue-rotate(216deg) brightness(101%) contrast(94%);
+}
+
+/* Main controls become light-surface controls in inverted mode. */
+body.theme-inverted .site-nav,
+body.theme-inverted .language-toggle {
+  border-color: rgba(88,115,248,.28);
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 5px 22px rgba(20,30,70,.08);
+}
+
+body.theme-inverted .site-nav a { color: rgba(88,115,248,.68); }
+body.theme-inverted .site-nav a:hover { color: var(--mobilepay-blue); }
+body.theme-inverted .site-nav a.is-active {
+  background: var(--mobilepay-blue);
+  color: #fff;
+}
+
+body.theme-inverted .language-toggle button { color: rgba(88,115,248,.62); }
+body.theme-inverted .language-toggle button.is-active {
+  background: var(--mobilepay-blue);
+  color: #fff;
+}
+
+body.theme-inverted .tldr-toggle,
+body.theme-inverted .tldr-toggle.on-light {
+  background: var(--mobilepay-blue);
+  color: #fff;
+}
+
+body.theme-inverted .tldr-toggle:hover,
+body.theme-inverted .tldr-toggle.on-light:hover,
+body.theme-inverted .tldr-toggle.is-active:hover,
+body.theme-inverted .tldr-toggle.on-light.is-active:hover {
+  background: #C2CEFF;
+  color: #001580;
+}
+
+body.theme-inverted .theme-toggle {
+  border-color: rgba(88,115,248,.28);
+  background: var(--mobilepay-blue);
+  color: #fff;
+}
+
+body.theme-inverted .theme-toggle:hover {
+  background: #001580;
+}
+
+/* Keep the explainer cards exactly as they are in either theme. */
+body.theme-inverted .tooltip-card {
+  background: var(--mobilepay-yellow);
+  color: var(--black);
+}
+
+/* The white video section is already compatible with the inverted story. */
+body.theme-inverted .video-section {
+  background: #fff;
+}
+
+@media (max-width: 600px) {
+  .theme-toggle {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
   }
-
-  to {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
 }
 
-@keyframes page-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* =========================================================
-   LANGUAGE CHANGE TRANSITION
-   ========================================================= */
-
-/*
- * app.js adds this class only while a language switch is running.
- * That means this named transition never interferes with normal
- * Story <-> FAQ navigation.
- */
-.language-transition-target {
-  view-transition-name: language-content;
-}
-
-::view-transition-old(language-content) {
-  animation: language-out 180ms cubic-bezier(.4, 0, .2, 1) both;
-}
-
-::view-transition-new(language-content) {
-  animation: language-in 320ms cubic-bezier(.22, 1, .36, 1) both;
-}
-
-::view-transition-old(language-content),
-::view-transition-new(language-content) {
-  mix-blend-mode: normal;
-}
-
-@keyframes language-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-
-  to {
-    opacity: 0;
-    transform: translateY(-6px);
-    filter: blur(1.5px);
-  }
-}
-
-@keyframes language-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-    filter: blur(1.5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-/* Keep the floating controls above transition snapshots. */
-.site-nav,
-.language-toggle,
-.tldr-toggle {
-  isolation: isolate;
-}
-
-/* Respect the user's reduced-motion preference. */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root),
-  ::view-transition-old(language-content),
-  ::view-transition-new(language-content) {
+  .term.term-attention {
     animation: none !important;
+  }
+}
+
+/* Vipps SVG is supplied in brand blue. Keep it white on the original blue
+   story surface, then reveal its native blue in the inverted light theme. */
+.vipps-logo {
+  filter: brightness(0) invert(1);
+}
+
+body.theme-inverted .vipps-logo {
+  filter: none;
+}
+
+/* Shared brand lockup: optical alignment between the two differently proportioned SVGs. */
+.brand-change-logo {
+  display: block;
+  width: auto;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+/* MobilePay's mark + wordmark has more visual whitespace, so it needs a slightly
+   taller box than Vipps to make the visible letterforms feel equally sized. */
+.mobilepay-logo {
+  height: clamp(30px, 3.05vw, 42px);
+}
+
+.vipps-logo {
+  height: clamp(27px, 2.72vw, 37.5px);
+}
+
+@media (max-width: 600px) {
+  .mobilepay-logo { height: 28px; }
+  .vipps-logo { height: 25px; }
+}
+
+@media (max-width: 380px) {
+  .mobilepay-logo { height: 24px; }
+  .vipps-logo { height: 21.5px; }
+}
+
+
+/* =========================================================
+   ACCESSIBILITY + RESPONSIVE HARDENING
+   ========================================================= */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  z-index: 1000;
+  transform: translate(-50%, -160%);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #E5EAFF;
+  color: #001580;
+  font-family: "Very Very Sans Text", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 5px 22px rgba(0,21,128,.18);
+  transition: transform .16s ease;
+}
+
+.skip-link:focus {
+  transform: translate(-50%, 0);
+  outline: 3px solid #001580;
+  outline-offset: 3px;
+}
+
+.site-nav a:focus-visible,
+.language-button:focus-visible,
+.theme-toggle:focus-visible,
+.faq-back:focus-visible,
+.faq-question:focus-visible {
+  outline: 3px solid #E5EAFF;
+  outline-offset: 3px;
+}
+
+.tldr-toggle:focus-visible,
+.tooltip-close:focus-visible {
+  outline: 3px solid #001580;
+  outline-offset: 3px;
+}
+
+.faq-page .site-nav a:focus-visible,
+.faq-page .language-button:focus-visible,
+.faq-page .faq-back:focus-visible,
+.faq-page .faq-question:focus-visible,
+.site-nav.on-light a:focus-visible,
+.language-toggle.on-light .language-button:focus-visible,
+body.theme-inverted .site-nav a:focus-visible,
+body.theme-inverted .language-button:focus-visible,
+body.theme-inverted .theme-toggle:focus-visible {
+  outline-color: #001580;
+}
+
+.faq-question:focus-visible { border-radius: 8px; }
+
+@media (max-width: 600px) {
+  .tldr-toggle { top: 58px; }
+  .content { padding-top: 132px; }
+}
+
+@media (max-width: 360px) {
+  .site-nav a,
+  .language-toggle button {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText !important;
+    outline-offset: 3px !important;
   }
 }

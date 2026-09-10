@@ -6,10 +6,34 @@
   const tldrButton = document.querySelector('.tldr-toggle');
   const tldrView = document.querySelector('.tldr-view');
   const floatingControls = [...document.querySelectorAll('.language-toggle, .site-nav, .tldr-toggle')];
+  const themeToggle = document.querySelector('.theme-toggle');
+  const a11yStatus = document.getElementById('a11y-status');
+  const decorativeVideo = document.querySelector('[data-decorative-video]');
 
   let activeLanguage = localStorage.getItem('core-story-language') || 'da';
   let tldrActive = false;
+  let invertedTheme = localStorage.getItem('core-story-inverted-theme') === 'true';
   if (!['da','en','fi'].includes(activeLanguage)) activeLanguage = 'da';
+
+  const languageNames = { da: 'Dansk', en: 'English', fi: 'Suomi' };
+  const themeLabels = {
+    da: { original: 'Brug originale farver', invert: 'Inverter farver' },
+    en: { original: 'Use original colours', invert: 'Invert colours' },
+    fi: { original: 'Käytä alkuperäisiä värejä', invert: 'Käännä värit' }
+  };
+
+  function announce(message) {
+    if (!a11yStatus || !message) return;
+    a11yStatus.textContent = '';
+    requestAnimationFrame(() => { a11yStatus.textContent = message; });
+  }
+
+  function translateAriaLabels(language) {
+    document.querySelectorAll(`[data-aria-${language}]`).forEach(el => {
+      const value = el.getAttribute(`data-aria-${language}`);
+      if (value != null) el.setAttribute('aria-label', value);
+    });
+  }
 
   function translateStatic(language) {
     document.querySelectorAll(`[data-${language}]`).forEach(el => {
@@ -110,6 +134,9 @@
       number.textContent = String(n);
 
       const questionText = document.createElement('span');
+      questionText.className = 'faq-question-text';
+      questionText.setAttribute('role', 'heading');
+      questionText.setAttribute('aria-level', '2');
       questionText.textContent = q;
 
       const plus = document.createElement('span');
@@ -135,6 +162,8 @@
   function syncStoryMode() {
     if (!tldrButton || !tldrView) return;
 
+    document.querySelector('.page')?.classList.toggle('is-tldr-active', tldrActive);
+
     heroTitle.hidden = tldrActive;
     tldrView.hidden = !tldrActive;
 
@@ -149,40 +178,78 @@
     tldrButton.textContent = tldrActive ? labels.full : labels.short;
     tldrButton.classList.toggle('is-active', tldrActive);
     tldrButton.setAttribute('aria-pressed', String(tldrActive));
+    tldrButton.setAttribute('aria-expanded', String(tldrActive));
     tldrButton.setAttribute(
       'aria-label',
       tldrActive ? labels.fullLabel : labels.shortLabel
     );
   }
 
-  function setTldr(active, { animate = true } = {}) {
-    if (!tldrButton || !tldrView || active === tldrActive) return;
+  let stateTransitionTimeline = null;
 
-    const target = document.querySelector('.content');
+  function animateStateChange(update, { animate = true } = {}) {
+    const target = document.querySelector('.content, .faq-shell');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const canAnimate =
       animate &&
       target &&
-      typeof document.startViewTransition === 'function' &&
-      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const apply = () => {
-      tldrActive = active;
-      syncStoryMode();
-    };
+      typeof window.gsap !== 'undefined' &&
+      !reduced;
 
     if (!canAnimate) {
-      apply();
+      update();
+      requestAnimationFrame(syncFloatingTheme);
       return;
     }
 
-    target.classList.add('language-transition-target');
+    // One state animation at a time. Killing the previous timeline prevents
+    // rapid language/TLDR clicks from stacking transforms and opacity tweens.
+    if (stateTransitionTimeline) {
+      stateTransitionTimeline.kill();
+      stateTransitionTimeline = null;
+    }
+    window.gsap.killTweensOf(target);
 
-    const transition = document.startViewTransition(apply);
-
-    transition.finished.finally(() => {
-      target.classList.remove('language-transition-target');
-      syncFloatingTheme();
+    stateTransitionTimeline = window.gsap.timeline({
+      defaults: { overwrite: 'auto' },
+      onComplete: () => {
+        window.gsap.set(target, { clearProps: 'opacity,transform,willChange' });
+        stateTransitionTimeline = null;
+        syncFloatingTheme();
+      }
     });
+
+    stateTransitionTimeline
+      .set(target, { willChange: 'transform,opacity' })
+      .to(target, {
+        opacity: 0,
+        y: -5,
+        duration: 0.14,
+        ease: 'power1.in'
+      })
+      .add(() => {
+        update();
+        // Start the new content just a few pixels lower. This is intentionally
+        // subtle so the language feels like it changes in-place.
+        window.gsap.set(target, { y: 6 });
+      })
+      .to(target, {
+        opacity: 1,
+        y: 0,
+        duration: 0.24,
+        ease: 'power2.out'
+      });
+  }
+
+  function setTldr(active, { animate = true } = {}) {
+    if (!tldrButton || !tldrView || active === tldrActive) return;
+
+    animateStateChange(() => {
+      tldrActive = active;
+      syncStoryMode();
+      const labels = tldrLabels[activeLanguage] || tldrLabels.en;
+      announce(tldrActive ? labels.fullLabel : labels.shortLabel);
+    }, { animate });
   }
 
   tldrButton?.addEventListener('click', () => {
@@ -230,6 +297,7 @@
     }
 
     translateStatic(language);
+    translateAriaLabels(language);
     renderFAQ(language);
     syncStoryMode();
 
@@ -241,6 +309,13 @@
 
     document.title =
       pageTitles[currentPage][language];
+
+    if (themeToggle) {
+      const labels = themeLabels[language] || themeLabels.en;
+      const label = invertedTheme ? labels.original : labels.invert;
+      themeToggle.setAttribute('aria-label', label);
+      themeToggle.title = label;
+    }
   }
 
   function setLanguage(
@@ -248,49 +323,12 @@
     { animate = true } = {}
   ) {
     if (!['da','en','fi'].includes(language)) return;
+    if (language === activeLanguage && animate) return;
 
-    if (
-      language === activeLanguage &&
-      animate
-    ) {
-      return;
-    }
-
-    const target =
-      document.querySelector(
-        '.content, .faq-shell'
-      );
-
-    const canAnimate =
-      animate &&
-      target &&
-      typeof document.startViewTransition === 'function' &&
-      !window.matchMedia(
-        '(prefers-reduced-motion: reduce)'
-      ).matches;
-
-    if (!canAnimate) {
+    animateStateChange(() => {
       applyLanguage(language);
-      requestAnimationFrame(syncFloatingTheme);
-      return;
-    }
-
-    target.classList.add(
-      'language-transition-target'
-    );
-
-    const transition =
-      document.startViewTransition(() => {
-        applyLanguage(language);
-      });
-
-    transition.finished.finally(() => {
-      target.classList.remove(
-        'language-transition-target'
-      );
-
-      syncFloatingTheme();
-    });
+      if (animate) announce(languageNames[language]);
+    }, { animate });
   }
 
   languageButtons.forEach(button =>
@@ -300,6 +338,26 @@
       );
     })
   );
+
+  function applyInvertedTheme(active) {
+    invertedTheme = Boolean(active);
+    document.body.classList.toggle('theme-inverted', invertedTheme);
+    localStorage.setItem('core-story-inverted-theme', String(invertedTheme));
+
+    if (themeToggle) {
+      const labels = themeLabels[activeLanguage] || themeLabels.en;
+      const label = invertedTheme ? labels.original : labels.invert;
+      themeToggle.setAttribute('aria-pressed', String(invertedTheme));
+      themeToggle.setAttribute('aria-label', label);
+      themeToggle.title = label;
+    }
+
+    requestAnimationFrame(syncFloatingTheme);
+  }
+
+  themeToggle?.addEventListener('click', () => {
+    applyInvertedTheme(!invertedTheme);
+  });
 
   const tooltip =
     document.getElementById('tooltip');
@@ -319,6 +377,12 @@
 
     let activeTerm = null;
     let closeTimer = null;
+
+    terms.forEach(term => {
+      term.setAttribute('aria-haspopup', 'dialog');
+      term.setAttribute('aria-controls', 'tooltip');
+      term.setAttribute('aria-expanded', 'false');
+    });
 
     function positionTooltip(target) {
       if (
@@ -384,7 +448,14 @@
     function openTooltip(target) {
       clearTimeout(closeTimer);
 
+      if (activeTerm && activeTerm !== target) {
+        activeTerm.setAttribute('aria-expanded', 'false');
+        activeTerm.removeAttribute('aria-describedby');
+      }
+
       activeTerm = target;
+      activeTerm.setAttribute('aria-expanded', 'true');
+      activeTerm.setAttribute('aria-describedby', 'tooltip-text');
 
       tooltipTitle.textContent =
         target.dataset.title;
@@ -406,8 +477,9 @@
       );
     }
 
-    function closeTooltip() {
+    function closeTooltip({ returnFocus = false } = {}) {
       clearTimeout(closeTimer);
+      const termToRestore = activeTerm;
 
       tooltip.classList.remove(
         'is-open'
@@ -418,7 +490,12 @@
         'true'
       );
 
+      if (activeTerm) {
+        activeTerm.setAttribute('aria-expanded', 'false');
+        activeTerm.removeAttribute('aria-describedby');
+      }
       activeTerm = null;
+      if (returnFocus && termToRestore) termToRestore.focus({ preventScroll: true });
     }
 
     function scheduleClose() {
@@ -449,7 +526,9 @@
 
       term.addEventListener(
         'blur',
-        scheduleClose
+        event => {
+          if (!tooltip.contains(event.relatedTarget)) scheduleClose();
+        }
       );
 
       term.addEventListener(
@@ -457,6 +536,7 @@
         e => {
           e.stopPropagation();
           openTooltip(term);
+          if (e.detail === 0) requestAnimationFrame(() => tooltipClose?.focus());
         }
       );
     });
@@ -471,11 +551,16 @@
       scheduleClose
     );
 
+    tooltip.addEventListener('focusin', () => clearTimeout(closeTimer));
+    tooltip.addEventListener('focusout', event => {
+      if (!tooltip.contains(event.relatedTarget) && event.relatedTarget !== activeTerm) scheduleClose();
+    });
+
     tooltipClose.addEventListener(
       'click',
       e => {
         e.stopPropagation();
-        closeTooltip();
+        closeTooltip({ returnFocus: true });
       }
     );
 
@@ -494,8 +579,9 @@
     document.addEventListener(
       'keydown',
       e => {
-        if (e.key === 'Escape') {
-          closeTooltip();
+        if (e.key === 'Escape' && activeTerm) {
+          e.preventDefault();
+          closeTooltip({ returnFocus: true });
         }
       }
     );
@@ -529,14 +615,10 @@
         'faq-page'
       );
 
-    if (isFAQ) {
+    if (isFAQ || document.body.classList.contains('theme-inverted')) {
       floatingControls.forEach(
-        control =>
-          control.classList.add(
-            'on-light'
-          )
+        control => control.classList.add('on-light')
       );
-
       return;
     }
 
@@ -593,10 +675,14 @@
 
   window.addEventListener(
     'pageshow',
-    () => {
+    event => {
       requestAnimationFrame(
         syncFloatingTheme
       );
+
+      if (event.persisted) {
+        requestAnimationFrame(setupTermAttention);
+      }
     }
   );
 
@@ -611,6 +697,294 @@
     }
   );
 
+
+  /* =======================================================
+     GSAP MOTION
+     ======================================================= */
+
+  const reducedMotionQuery = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  );
+  const prefersReducedMotion = reducedMotionQuery.matches;
+
+  function syncDecorativeVideoMotion() {
+    if (!decorativeVideo) return;
+    if (reducedMotionQuery.matches) decorativeVideo.pause();
+    else decorativeVideo.play().catch(() => {});
+  }
+
+  reducedMotionQuery.addEventListener?.('change', syncDecorativeVideoMotion);
+  syncDecorativeVideoMotion();
+
+  const hasGSAP = typeof window.gsap !== 'undefined';
+
+  /* =======================================================
+     EXPLAINER TERM DISCOVERY CUE
+     ======================================================= */
+
+  let termAttentionObserver = null;
+  let termAttentionTimers = [];
+
+  function clearTermAttentionTimers() {
+    termAttentionTimers.forEach(timer => window.clearTimeout(timer));
+    termAttentionTimers = [];
+  }
+
+  function setupTermAttention() {
+    const terms = [...document.querySelectorAll('.term')];
+    if (!terms.length) return;
+
+    termAttentionObserver?.disconnect();
+    clearTermAttentionTimers();
+    terms.forEach(term => term.classList.remove('term-attention'));
+
+    if (reducedMotionQuery.matches || !('IntersectionObserver' in window)) return;
+
+    termAttentionObserver = new IntersectionObserver(
+      entries => {
+        const entering = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+        entering.forEach((entry, index) => {
+          termAttentionObserver.unobserve(entry.target);
+
+          const timer = window.setTimeout(() => {
+            entry.target.classList.remove('term-attention');
+            void entry.target.offsetWidth;
+            entry.target.classList.add('term-attention');
+            entry.target.addEventListener(
+              'animationend',
+              () => entry.target.classList.remove('term-attention'),
+              { once: true }
+            );
+          }, 220 + index * 120);
+
+          termAttentionTimers.push(timer);
+        });
+      },
+      { threshold: 0.55, rootMargin: '0px 0px -8% 0px' }
+    );
+
+    terms.forEach(term => termAttentionObserver.observe(term));
+  }
+
+   /* =======================================================
+     REPEAT VISIBLE TERM CUE EVERY 30 SECONDS
+     ======================================================= */
+
+  function pulseVisibleTerms() {
+    if (
+      reducedMotionQuery.matches ||
+      document.hidden
+    ) {
+      return;
+    }
+
+    const visibleTerms = [
+      ...document.querySelectorAll(
+        '.story:not([hidden]) .term'
+      )
+    ].filter(term => {
+      const rect = term.getBoundingClientRect();
+
+      return (
+        rect.bottom > 0 &&
+        rect.top < window.innerHeight
+      );
+    });
+
+    visibleTerms.forEach((term, index) => {
+      const timer = window.setTimeout(() => {
+        term.classList.remove('term-attention');
+
+        void term.offsetWidth;
+
+        term.classList.add('term-attention');
+
+        term.addEventListener(
+          'animationend',
+          () => term.classList.remove('term-attention'),
+          { once: true }
+        );
+      }, index * 180);
+
+      termAttentionTimers.push(timer);
+    });
+  }
+
+  const termAttentionInterval = window.setInterval(
+    pulseVisibleTerms,
+    30000
+  );
+
+  window.addEventListener('pagehide', () => {
+    window.clearInterval(termAttentionInterval);
+  });
+
+  function animatePageEntrance() {
+    const internalNavigation = sessionStorage.getItem('core-story-internal-nav') === '1';
+    if (internalNavigation) {
+      sessionStorage.removeItem('core-story-internal-nav');
+      return;
+    }
+
+    if (!hasGSAP || prefersReducedMotion) return;
+
+    const shell = document.querySelector('.content, .faq-shell');
+    if (!shell) return;
+
+    window.gsap.fromTo(
+      shell,
+      { opacity: 0.92, y: 3 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.2,
+        ease: 'power2.out',
+        clearProps: 'opacity,transform'
+      }
+    );
+  }
+
+  function setupScrollTextReveals() {
+    if (!hasGSAP || prefersReducedMotion || !('IntersectionObserver' in window)) {
+      return;
+    }
+
+    const targets = [
+      ...document.querySelectorAll(
+        '.story:not([hidden]) p, .story:not([hidden]) .brand-change, .faq-item, .faq-section-title, .faq-footer'
+      )
+    ];
+
+    if (!targets.length) return;
+
+    targets.forEach(el => {
+      if (el.dataset.gsapRevealReady === 'true') return;
+      el.dataset.gsapRevealReady = 'true';
+      window.gsap.set(el, { opacity: 0, y: 18 });
+    });
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+
+          window.gsap.to(entry.target, {
+            opacity: 1,
+            y: 0,
+            duration: 0.52,
+            ease: 'power2.out',
+            overwrite: true,
+            onComplete: () => {
+              window.gsap.set(entry.target, { clearProps: 'opacity,transform,willChange' });
+            }
+          });
+
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.01, rootMargin: '0px 0px 22% 0px' }
+    );
+
+    targets.forEach(el => observer.observe(el));
+  }
+
+  function setupGSAPHovers() {
+    if (!hasGSAP || prefersReducedMotion) return;
+
+    // Keep GSAP hover motion away from the TLDR control: that button uses a
+    // CSS translateX(-50%) for centering, and competing transform writers can
+    // create a visible jump. Its existing CSS hover treatment is enough.
+    const hoverTargets = document.querySelectorAll(
+      '.site-nav a, .language-button, .faq-back'
+    );
+
+    hoverTargets.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        window.gsap.to(el, {
+          scale: 1.035,
+          duration: 0.16,
+          ease: 'power2.out',
+          overwrite: true
+        });
+      });
+
+      el.addEventListener('mouseleave', () => {
+        window.gsap.to(el, {
+          scale: 1,
+          duration: 0.18,
+          ease: 'power2.out',
+          overwrite: true,
+          onComplete: () => window.gsap.set(el, { clearProps: 'transform' })
+        });
+      });
+    });
+
+    document.addEventListener('mouseover', event => {
+      const question = event.target.closest('.faq-question');
+      if (!question || question.contains(event.relatedTarget)) return;
+      window.gsap.to(question, {
+        x: 4,
+        duration: 0.16,
+        ease: 'power2.out',
+        overwrite: true
+      });
+    });
+
+    document.addEventListener('mouseout', event => {
+      const question = event.target.closest('.faq-question');
+      if (!question || question.contains(event.relatedTarget)) return;
+      window.gsap.to(question, {
+        x: 0,
+        duration: 0.18,
+        ease: 'power2.out',
+        overwrite: true,
+        onComplete: () => window.gsap.set(question, { clearProps: 'transform' })
+      });
+    });
+  }
+
+  function setupPageTransitions() {
+    // Cross-document animation is handled by the browser View Transition API.
+    // We intentionally do NOT fade/transform the outgoing DOM here; doing so
+    // was the source of the visible blink on real document navigation.
+    document.addEventListener('click', event => {
+      const link = event.target.closest('a[href]');
+      if (!link) return;
+
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey ||
+        link.target === '_blank' ||
+        link.hasAttribute('download')
+      ) {
+        return;
+      }
+
+      const destination = new URL(link.href, window.location.href);
+      if (destination.origin !== window.location.origin) return;
+
+      const current = new URL(window.location.href);
+      if (
+        destination.pathname === current.pathname &&
+        destination.search === current.search &&
+        destination.hash === current.hash
+      ) {
+        return;
+      }
+
+      sessionStorage.setItem('core-story-internal-nav', '1');
+    });
+  }
+
+
+
   setLanguage(
     activeLanguage,
     {
@@ -618,7 +992,17 @@
     }
   );
 
-  requestAnimationFrame(
-    syncFloatingTheme
-  );
+  if (themeToggle) {
+    applyInvertedTheme(invertedTheme);
+  }
+
+  animatePageEntrance();
+  setupGSAPHovers();
+  setupPageTransitions();
+
+  requestAnimationFrame(() => {
+    setupScrollTextReveals();
+    setupTermAttention();
+    syncFloatingTheme();
+  });
 })();
