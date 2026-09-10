@@ -7,11 +7,33 @@
   const tldrView = document.querySelector('.tldr-view');
   const floatingControls = [...document.querySelectorAll('.language-toggle, .site-nav, .tldr-toggle')];
   const themeToggle = document.querySelector('.theme-toggle');
+  const a11yStatus = document.getElementById('a11y-status');
+  const decorativeVideo = document.querySelector('[data-decorative-video]');
 
   let activeLanguage = localStorage.getItem('core-story-language') || 'da';
   let tldrActive = false;
   let invertedTheme = localStorage.getItem('core-story-inverted-theme') === 'true';
   if (!['da','en','fi'].includes(activeLanguage)) activeLanguage = 'da';
+
+  const languageNames = { da: 'Dansk', en: 'English', fi: 'Suomi' };
+  const themeLabels = {
+    da: { original: 'Brug originale farver', invert: 'Inverter farver' },
+    en: { original: 'Use original colours', invert: 'Invert colours' },
+    fi: { original: 'Käytä alkuperäisiä värejä', invert: 'Käännä värit' }
+  };
+
+  function announce(message) {
+    if (!a11yStatus || !message) return;
+    a11yStatus.textContent = '';
+    requestAnimationFrame(() => { a11yStatus.textContent = message; });
+  }
+
+  function translateAriaLabels(language) {
+    document.querySelectorAll(`[data-aria-${language}]`).forEach(el => {
+      const value = el.getAttribute(`data-aria-${language}`);
+      if (value != null) el.setAttribute('aria-label', value);
+    });
+  }
 
   function translateStatic(language) {
     document.querySelectorAll(`[data-${language}]`).forEach(el => {
@@ -112,6 +134,9 @@
       number.textContent = String(n);
 
       const questionText = document.createElement('span');
+      questionText.className = 'faq-question-text';
+      questionText.setAttribute('role', 'heading');
+      questionText.setAttribute('aria-level', '2');
       questionText.textContent = q;
 
       const plus = document.createElement('span');
@@ -137,6 +162,8 @@
   function syncStoryMode() {
     if (!tldrButton || !tldrView) return;
 
+    document.querySelector('.page')?.classList.toggle('is-tldr-active', tldrActive);
+
     heroTitle.hidden = tldrActive;
     tldrView.hidden = !tldrActive;
 
@@ -151,6 +178,7 @@
     tldrButton.textContent = tldrActive ? labels.full : labels.short;
     tldrButton.classList.toggle('is-active', tldrActive);
     tldrButton.setAttribute('aria-pressed', String(tldrActive));
+    tldrButton.setAttribute('aria-expanded', String(tldrActive));
     tldrButton.setAttribute(
       'aria-label',
       tldrActive ? labels.fullLabel : labels.shortLabel
@@ -219,6 +247,8 @@
     animateStateChange(() => {
       tldrActive = active;
       syncStoryMode();
+      const labels = tldrLabels[activeLanguage] || tldrLabels.en;
+      announce(tldrActive ? labels.fullLabel : labels.shortLabel);
     }, { animate });
   }
 
@@ -267,6 +297,7 @@
     }
 
     translateStatic(language);
+    translateAriaLabels(language);
     renderFAQ(language);
     syncStoryMode();
 
@@ -278,6 +309,13 @@
 
     document.title =
       pageTitles[currentPage][language];
+
+    if (themeToggle) {
+      const labels = themeLabels[language] || themeLabels.en;
+      const label = invertedTheme ? labels.original : labels.invert;
+      themeToggle.setAttribute('aria-label', label);
+      themeToggle.title = label;
+    }
   }
 
   function setLanguage(
@@ -289,6 +327,7 @@
 
     animateStateChange(() => {
       applyLanguage(language);
+      if (animate) announce(languageNames[language]);
     }, { animate });
   }
 
@@ -306,12 +345,11 @@
     localStorage.setItem('core-story-inverted-theme', String(invertedTheme));
 
     if (themeToggle) {
+      const labels = themeLabels[activeLanguage] || themeLabels.en;
+      const label = invertedTheme ? labels.original : labels.invert;
       themeToggle.setAttribute('aria-pressed', String(invertedTheme));
-      themeToggle.setAttribute(
-        'aria-label',
-        invertedTheme ? 'Use original colours' : 'Invert colours'
-      );
-      themeToggle.title = invertedTheme ? 'Use original colours' : 'Invert colours';
+      themeToggle.setAttribute('aria-label', label);
+      themeToggle.title = label;
     }
 
     requestAnimationFrame(syncFloatingTheme);
@@ -339,6 +377,12 @@
 
     let activeTerm = null;
     let closeTimer = null;
+
+    terms.forEach(term => {
+      term.setAttribute('aria-haspopup', 'dialog');
+      term.setAttribute('aria-controls', 'tooltip');
+      term.setAttribute('aria-expanded', 'false');
+    });
 
     function positionTooltip(target) {
       if (
@@ -404,7 +448,14 @@
     function openTooltip(target) {
       clearTimeout(closeTimer);
 
+      if (activeTerm && activeTerm !== target) {
+        activeTerm.setAttribute('aria-expanded', 'false');
+        activeTerm.removeAttribute('aria-describedby');
+      }
+
       activeTerm = target;
+      activeTerm.setAttribute('aria-expanded', 'true');
+      activeTerm.setAttribute('aria-describedby', 'tooltip-text');
 
       tooltipTitle.textContent =
         target.dataset.title;
@@ -426,8 +477,9 @@
       );
     }
 
-    function closeTooltip() {
+    function closeTooltip({ returnFocus = false } = {}) {
       clearTimeout(closeTimer);
+      const termToRestore = activeTerm;
 
       tooltip.classList.remove(
         'is-open'
@@ -438,7 +490,12 @@
         'true'
       );
 
+      if (activeTerm) {
+        activeTerm.setAttribute('aria-expanded', 'false');
+        activeTerm.removeAttribute('aria-describedby');
+      }
       activeTerm = null;
+      if (returnFocus && termToRestore) termToRestore.focus({ preventScroll: true });
     }
 
     function scheduleClose() {
@@ -469,7 +526,9 @@
 
       term.addEventListener(
         'blur',
-        scheduleClose
+        event => {
+          if (!tooltip.contains(event.relatedTarget)) scheduleClose();
+        }
       );
 
       term.addEventListener(
@@ -477,6 +536,7 @@
         e => {
           e.stopPropagation();
           openTooltip(term);
+          if (e.detail === 0) requestAnimationFrame(() => tooltipClose?.focus());
         }
       );
     });
@@ -491,11 +551,16 @@
       scheduleClose
     );
 
+    tooltip.addEventListener('focusin', () => clearTimeout(closeTimer));
+    tooltip.addEventListener('focusout', event => {
+      if (!tooltip.contains(event.relatedTarget) && event.relatedTarget !== activeTerm) scheduleClose();
+    });
+
     tooltipClose.addEventListener(
       'click',
       e => {
         e.stopPropagation();
-        closeTooltip();
+        closeTooltip({ returnFocus: true });
       }
     );
 
@@ -514,8 +579,9 @@
     document.addEventListener(
       'keydown',
       e => {
-        if (e.key === 'Escape') {
-          closeTooltip();
+        if (e.key === 'Escape' && activeTerm) {
+          e.preventDefault();
+          closeTooltip({ returnFocus: true });
         }
       }
     );
@@ -609,10 +675,14 @@
 
   window.addEventListener(
     'pageshow',
-    () => {
+    event => {
       requestAnimationFrame(
         syncFloatingTheme
       );
+
+      if (event.persisted) {
+        requestAnimationFrame(setupTermAttention);
+      }
     }
   );
 
@@ -632,11 +702,125 @@
      GSAP MOTION
      ======================================================= */
 
-  const prefersReducedMotion = window.matchMedia(
+  const reducedMotionQuery = window.matchMedia(
     '(prefers-reduced-motion: reduce)'
-  ).matches;
+  );
+  const prefersReducedMotion = reducedMotionQuery.matches;
+
+  function syncDecorativeVideoMotion() {
+    if (!decorativeVideo) return;
+    if (reducedMotionQuery.matches) decorativeVideo.pause();
+    else decorativeVideo.play().catch(() => {});
+  }
+
+  reducedMotionQuery.addEventListener?.('change', syncDecorativeVideoMotion);
+  syncDecorativeVideoMotion();
 
   const hasGSAP = typeof window.gsap !== 'undefined';
+
+  /* =======================================================
+     EXPLAINER TERM DISCOVERY CUE
+     ======================================================= */
+
+  let termAttentionObserver = null;
+  let termAttentionTimers = [];
+
+  function clearTermAttentionTimers() {
+    termAttentionTimers.forEach(timer => window.clearTimeout(timer));
+    termAttentionTimers = [];
+  }
+
+  function setupTermAttention() {
+    const terms = [...document.querySelectorAll('.term')];
+    if (!terms.length) return;
+
+    termAttentionObserver?.disconnect();
+    clearTermAttentionTimers();
+    terms.forEach(term => term.classList.remove('term-attention'));
+
+    if (reducedMotionQuery.matches || !('IntersectionObserver' in window)) return;
+
+    termAttentionObserver = new IntersectionObserver(
+      entries => {
+        const entering = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+        entering.forEach((entry, index) => {
+          termAttentionObserver.unobserve(entry.target);
+
+          const timer = window.setTimeout(() => {
+            entry.target.classList.remove('term-attention');
+            void entry.target.offsetWidth;
+            entry.target.classList.add('term-attention');
+            entry.target.addEventListener(
+              'animationend',
+              () => entry.target.classList.remove('term-attention'),
+              { once: true }
+            );
+          }, 220 + index * 120);
+
+          termAttentionTimers.push(timer);
+        });
+      },
+      { threshold: 0.55, rootMargin: '0px 0px -8% 0px' }
+    );
+
+    terms.forEach(term => termAttentionObserver.observe(term));
+  }
+
+   /* =======================================================
+     REPEAT VISIBLE TERM CUE EVERY 30 SECONDS
+     ======================================================= */
+
+  function pulseVisibleTerms() {
+    if (
+      reducedMotionQuery.matches ||
+      document.hidden
+    ) {
+      return;
+    }
+
+    const visibleTerms = [
+      ...document.querySelectorAll(
+        '.story:not([hidden]) .term'
+      )
+    ].filter(term => {
+      const rect = term.getBoundingClientRect();
+
+      return (
+        rect.bottom > 0 &&
+        rect.top < window.innerHeight
+      );
+    });
+
+    visibleTerms.forEach((term, index) => {
+      const timer = window.setTimeout(() => {
+        term.classList.remove('term-attention');
+
+        void term.offsetWidth;
+
+        term.classList.add('term-attention');
+
+        term.addEventListener(
+          'animationend',
+          () => term.classList.remove('term-attention'),
+          { once: true }
+        );
+      }, index * 180);
+
+      termAttentionTimers.push(timer);
+    });
+  }
+
+  const termAttentionInterval = window.setInterval(
+    pulseVisibleTerms,
+    30000
+  );
+
+  window.addEventListener('pagehide', () => {
+    window.clearInterval(termAttentionInterval);
+  });
 
   function animatePageEntrance() {
     const internalNavigation = sessionStorage.getItem('core-story-internal-nav') === '1';
@@ -701,7 +885,7 @@
           observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -6% 0px' }
+      { threshold: 0.01, rootMargin: '0px 0px 22% 0px' }
     );
 
     targets.forEach(el => observer.observe(el));
@@ -818,6 +1002,7 @@
 
   requestAnimationFrame(() => {
     setupScrollTextReveals();
+    setupTermAttention();
     syncFloatingTheme();
   });
 })();

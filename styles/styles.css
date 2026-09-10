@@ -42,11 +42,15 @@
 
   --white: #ffffff;
   --black: #001580;
+  --ink: #312e2c;
 
   --content-width: 580px;
 
   /* One shared vertical rhythm for story sections. */
   --story-section-gap: clamp(38px, 5vw, 62px);
+
+  /* Shared spacing between the short-version title, copy and brand lockup. */
+  --tldr-content-gap: clamp(26px, 3vw, 42px);
 }
 
 
@@ -630,7 +634,7 @@
 
 
 .tldr-title {
-  margin: 0 0 clamp(26px, 3vw, 42px);
+  margin: 0 0 var(--tldr-content-gap);
 
   font-family: "Very Very Sans Display", sans-serif;
   font-size: clamp(50px, 7vw, 92px);
@@ -647,6 +651,27 @@
   font-size: clamp(20px, 2vw, 28px);
   font-weight: 400;
   line-height: 1.3;
+}
+
+
+/* When the short version is active, center the short story as one group.
+   The title-to-copy and copy-to-lockup gaps use the exact same token. */
+.page.is-tldr-active .content {
+  min-height: 100vh;
+  padding-top: clamp(90px, 12vh, 130px);
+  padding-bottom: clamp(90px, 12vh, 130px);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.page.is-tldr-active .tldr-view {
+  min-height: 0;
+}
+
+.page.is-tldr-active .brand-change {
+  margin-top: var(--tldr-content-gap);
 }
 
 
@@ -1012,7 +1037,7 @@
 .faq-page {
   min-height: 100vh;
   background: #fff;
-  color: #171717;
+  color: var(--ink);
 }
 
 .faq-shell {
@@ -1046,7 +1071,7 @@
 .faq-intro {
   max-width: 620px;
   margin: 0 auto clamp(56px, 8vw, 90px);
-  color: #5d5d5d;
+  color: var(--ink);
   font-size: clamp(17px, 1.8vw, 21px);
   line-height: 1.4;
   text-align: center;
@@ -1077,7 +1102,7 @@
   align-items: center;
   padding: 24px 12px;
   cursor: pointer;
-  color: #1a1a1a;
+  color: var(--ink);
   font-family: "Very Very Sans Display", sans-serif;
   font-size: clamp(18px, 2.1vw, 24px);
   font-weight: 500;
@@ -1127,7 +1152,7 @@
 
 .faq-answer {
   padding: 0 58px 28px 68px;
-  color: #4c4c4c;
+  color: var(--ink);
   font-family: "Very Very Sans Text", sans-serif;
   font-size: clamp(16px, 1.5vw, 19px);
   line-height: 1.52;
@@ -1219,6 +1244,22 @@
   background: #C2CEFF;
 }
 
+/* One-time discovery cue for explainer terms. The marker grows and settles
+   back without moving text or changing layout. */
+.term.term-attention {
+  animation: term-attention-pulse 1600ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+@keyframes term-attention-pulse {
+  0%, 100% {
+    box-shadow: inset 0 -.22em 0 rgba(194,206,255,.34);
+  }
+
+  45% {
+    box-shadow: inset 0 -.58em 0 rgba(194,206,255,.88);
+  }
+}
+
 /* Cross-document transitions: keep the old page fully opaque while the new
    page settles over it. This avoids exposing a bright intermediate canvas. */
 @view-transition {
@@ -1286,7 +1327,7 @@ body.theme-inverted .brand-change-text {
 body.theme-inverted .story,
 body.theme-inverted .story p,
 body.theme-inverted .tldr-copy {
-  color: #171717;
+  color: var(--ink);
 }
 
 /* The source MobilePay logo is white; tint it blue in the inverted test. */
@@ -1362,8 +1403,9 @@ body.theme-inverted .video-section {
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
+  ::view-transition-new(root),
+  .term.term-attention {
+    animation: none !important;
   }
 }
 
@@ -1403,4 +1445,93 @@ body.theme-inverted .vipps-logo {
 @media (max-width: 380px) {
   .mobilepay-logo { height: 24px; }
   .vipps-logo { height: 21.5px; }
+}
+
+
+/* =========================================================
+   ACCESSIBILITY + RESPONSIVE HARDENING
+   ========================================================= */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  z-index: 1000;
+  transform: translate(-50%, -160%);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #E5EAFF;
+  color: #001580;
+  font-family: "Very Very Sans Text", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 5px 22px rgba(0,21,128,.18);
+  transition: transform .16s ease;
+}
+
+.skip-link:focus {
+  transform: translate(-50%, 0);
+  outline: 3px solid #001580;
+  outline-offset: 3px;
+}
+
+.site-nav a:focus-visible,
+.language-button:focus-visible,
+.theme-toggle:focus-visible,
+.faq-back:focus-visible,
+.faq-question:focus-visible {
+  outline: 3px solid #E5EAFF;
+  outline-offset: 3px;
+}
+
+.tldr-toggle:focus-visible,
+.tooltip-close:focus-visible {
+  outline: 3px solid #001580;
+  outline-offset: 3px;
+}
+
+.faq-page .site-nav a:focus-visible,
+.faq-page .language-button:focus-visible,
+.faq-page .faq-back:focus-visible,
+.faq-page .faq-question:focus-visible,
+.site-nav.on-light a:focus-visible,
+.language-toggle.on-light .language-button:focus-visible,
+body.theme-inverted .site-nav a:focus-visible,
+body.theme-inverted .language-button:focus-visible,
+body.theme-inverted .theme-toggle:focus-visible {
+  outline-color: #001580;
+}
+
+.faq-question:focus-visible { border-radius: 8px; }
+
+@media (max-width: 600px) {
+  .tldr-toggle { top: 58px; }
+  .content { padding-top: 132px; }
+}
+
+@media (max-width: 360px) {
+  .site-nav a,
+  .language-toggle button {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText !important;
+    outline-offset: 3px !important;
+  }
 }
