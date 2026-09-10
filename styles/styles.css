@@ -44,6 +44,9 @@
   --black: #001580;
 
   --content-width: 580px;
+
+  /* One shared vertical rhythm for story sections. */
+  --story-section-gap: clamp(38px, 5vw, 62px);
 }
 
 
@@ -130,7 +133,7 @@
       padding:
         clamp(60px, 8vw, 110px)
         0
-        clamp(90px, 10vw, 150px);
+        var(--story-section-gap);
     }
 
 
@@ -146,8 +149,11 @@
 
       gap: clamp(10px, 1vw, 20px);
 
-      margin-bottom:
-        clamp(45px, 6vw, 80px);
+      /* Treat the lockup like another story section: the gap above it
+         and the gap from it to the video are driven by the same token
+         as the paragraph spacing. */
+      margin-top: var(--story-section-gap);
+      margin-bottom: 0;
     }
 
 
@@ -273,7 +279,7 @@
       margin:
         0
         0
-        clamp(38px, 5vw, 62px);
+        var(--story-section-gap);
     }
 
 
@@ -711,9 +717,6 @@
       }
 
 
-      .brand-change {
-        margin-bottom: 50px;
-      }
 
 
       .hero-title {
@@ -776,14 +779,12 @@
         padding:
           92px
           0
-          80px;
+          var(--story-section-gap);
       }
 
 
       .brand-change {
         gap: 10px;
-
-        margin-bottom: 42px;
       }
 
 
@@ -1374,4 +1375,32 @@ body.theme-inverted .video-section {
 
 body.theme-inverted .vipps-logo {
   filter: none;
+}
+
+/* Shared brand lockup: optical alignment between the two differently proportioned SVGs. */
+.brand-change-logo {
+  display: block;
+  width: auto;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+/* MobilePay's mark + wordmark has more visual whitespace, so it needs a slightly
+   taller box than Vipps to make the visible letterforms feel equally sized. */
+.mobilepay-logo {
+  height: clamp(30px, 3.05vw, 42px);
+}
+
+.vipps-logo {
+  height: clamp(27px, 2.72vw, 37.5px);
+}
+
+@media (max-width: 600px) {
+  .mobilepay-logo { height: 28px; }
+  .vipps-logo { height: 25px; }
+}
+
+@media (max-width: 380px) {
+  .mobilepay-logo { height: 24px; }
+  .vipps-logo { height: 21.5px; }
 }
