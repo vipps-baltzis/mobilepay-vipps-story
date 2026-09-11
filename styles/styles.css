@@ -1247,7 +1247,7 @@
 /* One-time discovery cue for explainer terms. The marker grows and settles
    back without moving text or changing layout. */
 .term.term-attention {
-  animation: term-attention-pulse 1600ms cubic-bezier(.22, 1, .36, 1) both;
+  animation: term-attention-pulse 3200ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 @keyframes term-attention-pulse {
