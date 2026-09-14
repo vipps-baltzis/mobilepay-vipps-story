@@ -301,6 +301,12 @@
     renderFAQ(language);
     syncStoryMode();
 
+    // Rebuild reveal observers for newly visible translated/FAQ content once
+    // motion has loaded. Translation itself never waits for GSAP.
+    if (motionInitialized) {
+      requestAnimationFrame(setupScrollTextReveals);
+    }
+
     const currentPage =
       document.body.dataset.page === 'faq' ||
       document.body.classList.contains('faq-page')
@@ -716,7 +722,35 @@
   reducedMotionQuery.addEventListener?.('change', syncDecorativeVideoMotion);
   syncDecorativeVideoMotion();
 
-  const hasGSAP = typeof window.gsap !== 'undefined';
+  const GSAP_SRC = 'https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js';
+  let motionInitialized = false;
+  let scrollRevealObserver = null;
+
+  function hasGSAP() {
+    return typeof window.gsap !== 'undefined';
+  }
+
+  function loadGSAP() {
+    if (hasGSAP()) return Promise.resolve(window.gsap);
+
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[data-gsap-loader]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve(window.gsap), { once: true });
+        existing.addEventListener('error', reject, { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = GSAP_SRC;
+      script.async = true;
+      script.dataset.gsapLoader = 'true';
+      script.crossOrigin = 'anonymous';
+      script.addEventListener('load', () => resolve(window.gsap), { once: true });
+      script.addEventListener('error', reject, { once: true });
+      document.head.appendChild(script);
+    });
+  }
 
   /* =======================================================
      EXPLAINER TERM DISCOVERY CUE
@@ -829,7 +863,7 @@
       return;
     }
 
-    if (!hasGSAP || prefersReducedMotion) return;
+    if (!hasGSAP() || reducedMotionQuery.matches) return;
 
     const shell = document.querySelector('.content, .faq-shell');
     if (!shell) return;
@@ -848,7 +882,7 @@
   }
 
   function setupScrollTextReveals() {
-    if (!hasGSAP || prefersReducedMotion || !('IntersectionObserver' in window)) {
+    if (!hasGSAP() || reducedMotionQuery.matches || !('IntersectionObserver' in window)) {
       return;
     }
 
@@ -860,39 +894,69 @@
 
     if (!targets.length) return;
 
+    scrollRevealObserver?.disconnect();
+
+    // Never hide content that is already visible on first paint. Only content
+    // outside the viewport starts faded out, which removes the initial flash.
     targets.forEach(el => {
-      if (el.dataset.gsapRevealReady === 'true') return;
+      const rect = el.getBoundingClientRect();
+      const alreadyVisible = rect.bottom > -20 && rect.top < window.innerHeight + 20;
+
       el.dataset.gsapRevealReady = 'true';
-      window.gsap.set(el, { opacity: 0, y: 18 });
+      window.gsap.killTweensOf(el);
+
+      if (alreadyVisible) {
+        window.gsap.set(el, { opacity: 1, y: 0, clearProps: 'willChange' });
+      } else {
+        window.gsap.set(el, { opacity: 0, y: 14, willChange: 'transform,opacity' });
+      }
     });
 
-    const observer = new IntersectionObserver(
+    scrollRevealObserver = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
+          const target = entry.target;
 
-          window.gsap.to(entry.target, {
-            opacity: 1,
-            y: 0,
-            duration: 0.52,
-            ease: 'power2.out',
+          if (entry.isIntersecting) {
+            window.gsap.to(target, {
+              opacity: 1,
+              y: 0,
+              duration: 0.58,
+              ease: 'power2.out',
+              overwrite: true,
+              onComplete: () => {
+                window.gsap.set(target, { clearProps: 'willChange' });
+              }
+            });
+            return;
+          }
+
+          const rect = target.getBoundingClientRect();
+          const y = rect.bottom <= 0 ? -10 : 10;
+
+          window.gsap.to(target, {
+            opacity: 0,
+            y,
+            duration: 0.34,
+            ease: 'power1.out',
             overwrite: true,
-            onComplete: () => {
-              window.gsap.set(entry.target, { clearProps: 'opacity,transform,willChange' });
+            onStart: () => {
+              window.gsap.set(target, { willChange: 'transform,opacity' });
             }
           });
-
-          observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.01, rootMargin: '0px 0px 22% 0px' }
+      {
+        threshold: 0.06,
+        rootMargin: '6% 0px 6% 0px'
+      }
     );
 
-    targets.forEach(el => observer.observe(el));
+    targets.forEach(el => scrollRevealObserver.observe(el));
   }
 
   function setupGSAPHovers() {
-    if (!hasGSAP || prefersReducedMotion) return;
+    if (!hasGSAP() || reducedMotionQuery.matches) return;
 
     // Keep GSAP hover motion away from the TLDR control: that button uses a
     // CSS translateX(-50%) for centering, and competing transform writers can
@@ -996,13 +1060,26 @@
     applyInvertedTheme(invertedTheme);
   }
 
-  animatePageEntrance();
-  setupGSAPHovers();
+  // Critical UI is ready immediately. FAQ rendering, translations and
+  // navigation no longer wait for the external GSAP request.
   setupPageTransitions();
 
   requestAnimationFrame(() => {
-    setupScrollTextReveals();
     setupTermAttention();
     syncFloatingTheme();
   });
+
+  // GSAP is progressive enhancement: load it after usable content is already
+  // on screen, then attach the motion layer. A CDN failure leaves content intact.
+  if (!reducedMotionQuery.matches) {
+    loadGSAP()
+      .then(() => {
+        motionInitialized = true;
+        setupGSAPHovers();
+        requestAnimationFrame(setupScrollTextReveals);
+      })
+      .catch(() => {
+        motionInitialized = false;
+      });
+  }
 })();
