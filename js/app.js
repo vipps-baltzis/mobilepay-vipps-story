@@ -256,6 +256,69 @@
     setTldr(!tldrActive);
   });
 
+  /* =======================================================
+     TLDR BUTTON: HIDE ON SCROLL DOWN, SHOW ON SCROLL UP
+     ======================================================= */
+
+  function setupTldrScrollVisibility() {
+    if (!tldrButton) return;
+
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+    const directionThreshold = 4;
+    const topSafeZone = 80;
+
+    function updateTldrVisibility() {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollY;
+
+      if (currentScrollY <= topSafeZone) {
+        tldrButton.classList.remove('is-scroll-hidden');
+        lastScrollY = currentScrollY;
+        ticking = false;
+        return;
+      }
+
+      // Ignore tiny trackpad/touch jitter and let it accumulate until the
+      // movement is intentional enough to establish a direction.
+      if (Math.abs(delta) < directionThreshold) {
+        ticking = false;
+        return;
+      }
+
+      if (delta > 0 && !tldrButton.matches(':focus-visible')) {
+        tldrButton.classList.add('is-scroll-hidden');
+      } else {
+        tldrButton.classList.remove('is-scroll-hidden');
+      }
+
+      lastScrollY = currentScrollY;
+      ticking = false;
+    }
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(updateTldrVisibility);
+      },
+      { passive: true }
+    );
+
+    // Keyboard users should never focus an off-screen control.
+    tldrButton.addEventListener('focus', () => {
+      tldrButton.classList.remove('is-scroll-hidden');
+    });
+
+    window.addEventListener('pageshow', () => {
+      lastScrollY = window.scrollY;
+      tldrButton.classList.remove('is-scroll-hidden');
+    });
+  }
+
+  setupTldrScrollVisibility();
+
   function applyLanguage(language) {
     activeLanguage = language;
 
@@ -764,97 +827,98 @@
     termAttentionTimers = [];
   }
 
+  function triggerTermAttention(term, delay = 0) {
+    const timer = window.setTimeout(() => {
+      term.classList.remove('term-attention');
+      void term.offsetWidth;
+      term.classList.add('term-attention');
+      term.addEventListener(
+        'animationend',
+        () => term.classList.remove('term-attention'),
+        { once: true }
+      );
+    }, delay);
+
+    termAttentionTimers.push(timer);
+  }
+
   function setupTermAttention() {
     const terms = [...document.querySelectorAll('.term')];
     if (!terms.length) return;
 
     termAttentionObserver?.disconnect();
     clearTermAttentionTimers();
-    terms.forEach(term => term.classList.remove('term-attention'));
+    terms.forEach(term => {
+      term.classList.remove('term-attention');
+      term.dataset.termInView = 'false';
+    });
 
     if (reducedMotionQuery.matches || !('IntersectionObserver' in window)) return;
 
     termAttentionObserver = new IntersectionObserver(
       entries => {
         const entering = entries
-          .filter(entry => entry.isIntersecting)
+          .filter(
+            entry =>
+              entry.isIntersecting &&
+              entry.intersectionRatio >= 0.55 &&
+              entry.target.dataset.termInView !== 'true'
+          )
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
 
-        entering.forEach((entry, index) => {
-          termAttentionObserver.unobserve(entry.target);
-
-          const timer = window.setTimeout(() => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting || entry.intersectionRatio < 0.15) {
+            entry.target.dataset.termInView = 'false';
             entry.target.classList.remove('term-attention');
-            void entry.target.offsetWidth;
-            entry.target.classList.add('term-attention');
-            entry.target.addEventListener(
-              'animationend',
-              () => entry.target.classList.remove('term-attention'),
-              { once: true }
-            );
-          }, 220 + index * 120);
+          }
+        });
 
-          termAttentionTimers.push(timer);
+        entering.forEach((entry, index) => {
+          entry.target.dataset.termInView = 'true';
+          triggerTermAttention(entry.target, 220 + index * 120);
         });
       },
-      { threshold: 0.55, rootMargin: '0px 0px -8% 0px' }
+      { threshold: [0, 0.15, 0.55], rootMargin: '0px 0px -8% 0px' }
     );
 
     terms.forEach(term => termAttentionObserver.observe(term));
   }
 
-   /* =======================================================
+  /* =======================================================
      REPEAT VISIBLE TERM CUE EVERY 30 SECONDS
      ======================================================= */
 
   function pulseVisibleTerms() {
-    if (
-      reducedMotionQuery.matches ||
-      document.hidden
-    ) {
-      return;
-    }
+    if (reducedMotionQuery.matches || document.hidden) return;
 
     const visibleTerms = [
-      ...document.querySelectorAll(
-        '.story:not([hidden]) .term'
-      )
+      ...document.querySelectorAll('.story:not([hidden]) .term')
     ].filter(term => {
       const rect = term.getBoundingClientRect();
-
-      return (
-        rect.bottom > 0 &&
-        rect.top < window.innerHeight
-      );
+      return rect.bottom > 0 && rect.top < window.innerHeight;
     });
 
     visibleTerms.forEach((term, index) => {
-      const timer = window.setTimeout(() => {
-        term.classList.remove('term-attention');
-
-        void term.offsetWidth;
-
-        term.classList.add('term-attention');
-
-        term.addEventListener(
-          'animationend',
-          () => term.classList.remove('term-attention'),
-          { once: true }
-        );
-      }, index * 180);
-
-      termAttentionTimers.push(timer);
+      triggerTermAttention(term, index * 180);
     });
   }
 
-  const termAttentionInterval = window.setInterval(
-    pulseVisibleTerms,
-    30000
-  );
+  let termAttentionInterval = null;
 
-  window.addEventListener('pagehide', () => {
+  function startTermAttentionInterval() {
+    if (termAttentionInterval) window.clearInterval(termAttentionInterval);
+    termAttentionInterval = window.setInterval(pulseVisibleTerms, 30000);
+  }
+
+  function stopTermAttentionInterval() {
+    if (!termAttentionInterval) return;
     window.clearInterval(termAttentionInterval);
-  });
+    termAttentionInterval = null;
+  }
+
+  startTermAttentionInterval();
+  window.addEventListener('pagehide', stopTermAttentionInterval);
+  window.addEventListener('pageshow', startTermAttentionInterval);
 
   function animatePageEntrance() {
     const internalNavigation = sessionStorage.getItem('core-story-internal-nav') === '1';
