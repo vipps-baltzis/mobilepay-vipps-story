@@ -1434,17 +1434,17 @@ body.theme-inverted .vipps-logo {
 }
 
 .vipps-logo {
-  height: clamp(27px, 2.72vw, 37.5px);
+  height: clamp(20px, 1.85vw, 25px);
 }
 
 @media (max-width: 600px) {
   .mobilepay-logo { height: 28px; }
-  .vipps-logo { height: 25px; }
+  .vipps-logo { height: 19px; }
 }
 
 @media (max-width: 380px) {
   .mobilepay-logo { height: 24px; }
-  .vipps-logo { height: 21.5px; }
+  .vipps-logo { height: 16.5px; }
 }
 
 
